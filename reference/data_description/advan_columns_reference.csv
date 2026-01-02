@@ -1,0 +1,53 @@
+column_number,column_name,data_type,description,keep,reason
+1,PLACEKEY,string,Unique identifier for the POI,YES,Primary key
+2,PARENT_PLACEKEY,string,Parent location identifier (for locations within larger venues),YES,User requested
+3,SAFEGRAPH_BRAND_IDS,string,Internal brand identifiers,YES,User requested
+4,LOCATION_NAME,string,Business/location name,YES,Needed for output
+5,BRANDS,string,Brand name(s) associated with location,YES,Brand analysis
+6,STORE_ID,string,Retailer's own store identifier,YES,User requested
+7,TOP_CATEGORY,string,High-level business category,YES,Business classification
+8,SUB_CATEGORY,string,Detailed business category,YES,Business classification
+9,NAICS_CODE,string,North American Industry Classification System code,YES,Industry analysis
+10,LATITUDE,double,Location latitude,YES,User requested
+11,LONGITUDE,double,Location longitude,YES,User requested
+12,STREET_ADDRESS,string,Street address of location,YES,User requested
+13,CITY,string,City name,YES,Geographic analysis
+14,REGION,string,State/region code (e.g. OH),YES,Required for filtering
+15,POSTAL_CODE,string,ZIP/postal code,YES,User requested
+16,OPEN_HOURS,string,JSON of operating hours by day,NO,Not relevant to partisan analysis
+17,CATEGORY_TAGS,string,Additional category tags,NO,Have TOP/SUB_CATEGORY already
+18,OPENED_ON,timestamp,Date location opened,YES,User requested
+19,CLOSED_ON,timestamp,Date location closed,YES,User requested
+20,TRACKING_CLOSED_SINCE,timestamp,Date tracking stopped,YES,User requested
+21,WEBSITES,string,Website URLs,YES,User requested
+22,GEOMETRY_TYPE,string,Type of geographic boundary,YES,User requested
+23,POLYGON_WKT,string,Well-known text polygon boundary,NO,Very large field - major memory savings
+24,POLYGON_CLASS,string,Classification of polygon,YES,User requested
+25,ENCLOSED,string,Whether location is enclosed,YES,User requested
+26,PHONE_NUMBER,int64,Phone number,NO,Not relevant to partisan analysis
+27,IS_SYNTHETIC,string,Whether POI is synthetic/estimated,YES,User requested
+28,INCLUDES_PARKING_LOT,string,Whether polygon includes parking,NO,Not relevant to partisan analysis
+29,ISO_COUNTRY_CODE,string,Country code (US/CA),YES,Required for filtering
+30,WKT_AREA_SQ_METERS,int64,Area of location in sq meters,NO,Not relevant to partisan analysis
+31,DATE_RANGE_END,date,End date of the month,YES,User requested for monthly stats
+32,RAW_VISIT_COUNTS,double,Total visits in the month,YES,Volume metric
+33,RAW_VISITOR_COUNTS,double,Unique visitors in the month,YES,Volume metric
+34,VISITS_BY_DAY,string,JSON array of daily visit counts,NO,Too granular for monthly analysis
+35,POI_CBG,int64,Census Block Group where POI is located,YES,Location's own partisan context
+36,VISITOR_HOME_CBGS,string,JSON dict of visitor home CBGs and counts,YES,Core data for partisan lean
+37,VISITOR_HOME_AGGREGATION,string,Aggregation method for home CBGs,YES,User requested for comparison
+38,VISITOR_DAYTIME_CBGS,string,JSON dict of daytime visitor CBGs and counts,YES,Daytime comparison analysis
+39,VISITOR_COUNTRY_OF_ORIGIN,string,JSON of international visitors by country,NO,Focus is domestic US
+40,DISTANCE_FROM_HOME,string,JSON distribution of visitor travel distances,YES,User requested
+41,MEDIAN_DWELL,string,Median time spent at location (minutes),YES,User requested
+42,BUCKETED_DWELL_TIMES,string,JSON distribution of dwell times,YES,User requested
+43,RELATED_SAME_DAY_BRAND,string,JSON of co-visited brands same day,YES,User requested
+44,RELATED_SAME_MONTH_BRAND,string,JSON of co-visited brands same month,YES,User requested
+45,POPULARITY_BY_HOUR,string,JSON of visits by hour of day,NO,Not relevant to partisan analysis
+46,POPULARITY_BY_DAY,string,JSON of visits by day of week,NO,Not relevant to partisan analysis
+47,DEVICE_TYPE,string,JSON breakdown by device type,NO,Not relevant to partisan analysis
+48,NORMALIZED_VISITS_BY_STATE_SCALING,double,Visits normalized by state device coverage,YES,User requested
+49,NORMALIZED_VISITS_BY_REGION_NAICS_VISITS,double,Visits normalized by region+industry,YES,User requested
+50,NORMALIZED_VISITS_BY_REGION_NAICS_VISITORS,double,Visitors normalized by region+industry,YES,User requested
+51,NORMALIZED_VISITS_BY_TOTAL_VISITS,double,Visits normalized nationally,YES,User requested
+52,NORMALIZED_VISITS_BY_TOTAL_VISITORS,double,Visitors normalized nationally,YES,User requested

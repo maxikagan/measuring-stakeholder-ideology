@@ -526,11 +526,17 @@ MarketShare_jmt = β(RelativeAlignment_jmt) + Brand_FE + Market_FE + Time_FE + �
 
 ## Open Questions (Remaining)
 
-1. What is the seniority variable in Politics at Work? How is it constructed?
-2. Is Revelio parent-child typology available for rolling up subsidiaries?
+1. ~~What is the seniority variable in Politics at Work? How is it constructed?~~ **ANSWERED**: Revelio provides 7-tier seniority scale (Entry → Senior Executive)
+2. Is Revelio parent-child typology available for rolling up subsidiaries? (Company mapping resolves subsidiary relationships via RCID)
 3. What is the structure of Neighborhood Patterns data? (CBG × month?)
 4. Is SafeGraph spending data available through Dewey?
-5. What are the Revelio job role categories? (User adding hierarchy)
+5. ~~What are the Revelio job role categories?~~ **ANSWERED**: 1,500 categories → 7 general categories via Jobs Taxonomy
+
+**From Reference Materials**:
+- **Revelio Jobs Taxonomy**: 7 general categories (need to identify which are customer-facing)
+- **Revelio Seniority**: 7 tiers - Entry, Junior, Mid, Senior, Manager, Director, Senior Executive
+- **PAW Public Data**: 534K employers, 2012-2024, via `vrid` identifier
+- **PAW Microdata**: 45M individuals with work histories (user has access)
 
 ---
 
