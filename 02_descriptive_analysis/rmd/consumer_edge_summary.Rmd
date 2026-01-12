@@ -1,0 +1,559 @@
+---
+title: "Project Oakland: Consumer Edge Data Summary"
+author: "Max Kagan"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    theme: flatly
+    highlight: tango
+    code_folding: hide
+    fig_width: 10
+    fig_height: 6
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center"
+)
+
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(scales)
+library(knitr)
+library(kableExtra)
+library(lubridate)
+
+theme_set(theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(color = "gray40"),
+    legend.position = "bottom"
+  ))
+
+options(scipen = 999)
+```
+
+# Executive Summary
+
+This report summarizes the **Consumer Edge "Brand and Geography Cohort Breakout USA 1"** dataset, a consumer spending panel covering credit/debit card transactions aggregated by brand, geography, and time period. The data spans Q4 2022 through Q2 2025 with ~130M+ rows across 64 files.
+
+**Key Use Case for Project Oakland:** This data provides brand-level consumer spending as a potential **dependent variable** to measure whether employee-consumer partisan alignment affects actual purchasing behavior.
+
+## Key Metrics Available
+
+| Metric | Description |
+|--------|-------------|
+| `SPEND_AMOUNT` | Total consumer spending ($) |
+| `TRANS_COUNT` | Number of transactions |
+| `INDIVIDUAL_COUNT` | Count of unique consumers |
+| `YA_*` columns | Year-over-year comparisons |
+
+## Geographic Granularity
+
+- **TOTAL_US**: National aggregates
+- **CENSUS_REGION**: 4 regions (Northeast, Midwest, South, West)
+- **CENSUS_DIVISION**: 9 divisions
+- **STATE**: 50 states + DC
+- **CSA**: Combined Statistical Areas (metro regions)
+
+---
+
+# 1. Data Loading
+
+```{r load-data}
+data_dir <- "/global/scratch/users/maxkagan/consumer_edge_data_2026-01-12/brand-and-geography-cohort-breakout-usa-1"
+
+files <- list.files(data_dir, pattern = "\\.csv\\.gz$", full.names = TRUE)
+n_total_files <- length(files)
+
+sample_files <- files[1:3]
+dt <- rbindlist(lapply(sample_files, fread), fill = TRUE)
+
+n_rows_sample <- nrow(dt)
+n_cols <- ncol(dt)
+```
+
+**Data Source:** `r data_dir`
+
+- **Total files available:** `r n_total_files`
+- **Files loaded (sample):** `r length(sample_files)`
+- **Rows in sample:** `r format(n_rows_sample, big.mark = ",")`
+- **Columns:** `r n_cols`
+
+---
+
+# 2. Data Structure & Quality
+
+## 2.1 Column Inventory
+
+```{r column-inventory}
+col_info <- data.frame(
+  Column = names(dt),
+  Type = sapply(dt, function(x) class(x)[1]),
+  NonMissing = sapply(dt, function(x) {
+    if (is.character(x)) sum(!is.na(x) & x != "") else sum(!is.na(x))
+  }),
+  PctComplete = sapply(dt, function(x) {
+    if (is.character(x)) mean(!is.na(x) & x != "") * 100 else mean(!is.na(x)) * 100
+  })
+)
+
+col_info %>%
+  mutate(
+    NonMissing = format(NonMissing, big.mark = ","),
+    PctComplete = paste0(round(PctComplete, 1), "%")
+  ) %>%
+  kable(caption = "Column Inventory", row.names = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## 2.2 Sample Data Preview
+
+```{r data-preview}
+dt[1:5, .(BRAND_ID, BRAND_NAME, GEO, GEO_TYPE, PERIOD, SPEND_AMOUNT, TRANS_COUNT)] %>%
+  kable(caption = "Sample Rows") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## 2.3 Period Types Available
+
+```{r period-types}
+period_summary <- dt[, .(
+  N_Rows = .N,
+  N_Brands = uniqueN(BRAND_ID),
+  Total_Spend = sum(SPEND_AMOUNT, na.rm = TRUE)
+), by = PERIOD_TYPE][order(-N_Rows)]
+
+period_summary %>%
+  mutate(
+    N_Rows = format(N_Rows, big.mark = ","),
+    N_Brands = format(N_Brands, big.mark = ","),
+    Total_Spend = paste0("$", format(round(Total_Spend / 1e9, 2), big.mark = ","), "B")
+  ) %>%
+  kable(caption = "Data by Period Type") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## 2.4 Geographic Coverage
+
+```{r geo-coverage}
+geo_summary <- dt[, .(
+  N_Rows = .N,
+  N_Unique_Geos = uniqueN(GEO),
+  Total_Spend = sum(SPEND_AMOUNT, na.rm = TRUE)
+), by = GEO_TYPE][order(-Total_Spend)]
+
+geo_summary %>%
+  mutate(
+    N_Rows = format(N_Rows, big.mark = ","),
+    N_Unique_Geos = format(N_Unique_Geos, big.mark = ","),
+    Total_Spend = paste0("$", format(round(Total_Spend / 1e9, 2), big.mark = ","), "B")
+  ) %>%
+  kable(caption = "Data by Geography Type") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## 2.5 Date Range
+
+```{r date-range}
+if (!inherits(dt$PERIOD_START_DT, "Date")) {
+  dt[, PERIOD_START_DT := as.Date(PERIOD_START_DT)]
+}
+if (!inherits(dt$PERIOD_END_DT, "Date")) {
+  dt[, PERIOD_END_DT := as.Date(PERIOD_END_DT)]
+}
+
+date_range <- dt[, .(
+  Min_Date = min(PERIOD_START_DT, na.rm = TRUE),
+  Max_Date = max(PERIOD_END_DT, na.rm = TRUE)
+)]
+
+cat("Date range:", as.character(date_range$Min_Date), "to", as.character(date_range$Max_Date))
+```
+
+---
+
+# 3. Brand-Level Analysis
+
+## 3.1 Brand Universe
+
+```{r brand-universe}
+n_brands <- uniqueN(dt$BRAND_ID)
+n_brand_names <- uniqueN(dt$BRAND_NAME)
+
+cat("Unique BRAND_IDs:", format(n_brands, big.mark = ","), "\n")
+cat("Unique BRAND_NAMEs:", format(n_brand_names, big.mark = ","))
+```
+
+## 3.2 Top 50 Brands by Total Spend
+
+```{r top-brands}
+brand_totals <- dt[GEO_TYPE == "TOTAL_US" & PERIOD_TYPE == "MONTH", .(
+  Total_Spend = sum(SPEND_AMOUNT, na.rm = TRUE),
+  Total_Trans = sum(TRANS_COUNT, na.rm = TRUE),
+  Total_Individuals = sum(INDIVIDUAL_COUNT, na.rm = TRUE),
+  N_Periods = uniqueN(PERIOD)
+), by = .(BRAND_ID, BRAND_NAME)][order(-Total_Spend)]
+
+top_50 <- brand_totals[1:50]
+
+top_50 %>%
+  mutate(
+    Total_Spend = paste0("$", format(round(Total_Spend / 1e9, 2), big.mark = ","), "B"),
+    Total_Trans = format(Total_Trans, big.mark = ","),
+    Total_Individuals = format(Total_Individuals, big.mark = ",")
+  ) %>%
+  select(BRAND_NAME, Total_Spend, Total_Trans, N_Periods) %>%
+  kable(caption = "Top 50 Brands by Total Spend (National, Monthly Data)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) %>%
+  scroll_box(height = "500px")
+```
+
+## 3.3 Brand Concentration
+
+```{r brand-concentration, fig.height=5}
+brand_totals[, cumulative_pct := cumsum(Total_Spend) / sum(Total_Spend) * 100]
+brand_totals[, rank := .I]
+
+concentration_points <- brand_totals[rank %in% c(10, 25, 50, 100, 250, 500)]
+
+ggplot(brand_totals[rank <= 500], aes(x = rank, y = cumulative_pct)) +
+  geom_line(color = "steelblue", linewidth = 1) +
+  geom_point(data = concentration_points, color = "red", size = 3) +
+  geom_text(data = concentration_points,
+            aes(label = paste0(round(cumulative_pct, 1), "%")),
+            vjust = -1, hjust = 0.5, size = 3) +
+  geom_hline(yintercept = c(50, 80), linetype = "dashed", alpha = 0.5) +
+  labs(
+    title = "Brand Concentration Curve",
+    subtitle = "Cumulative % of total spend by brand rank",
+    x = "Brand Rank",
+    y = "Cumulative % of Total Spend"
+  ) +
+  scale_y_continuous(limits = c(0, 100))
+```
+
+```{r concentration-stats}
+n_total_brands <- nrow(brand_totals)
+
+if (n_total_brands >= 10) {
+  top_10_pct <- brand_totals[rank == 10, cumulative_pct]
+  cat("Top 10 brands:", round(top_10_pct, 1), "% of spend\n")
+}
+if (n_total_brands >= 50) {
+  top_50_pct <- brand_totals[rank == 50, cumulative_pct]
+  cat("Top 50 brands:", round(top_50_pct, 1), "% of spend\n")
+}
+if (n_total_brands >= 100) {
+  top_100_pct <- brand_totals[rank == 100, cumulative_pct]
+  cat("Top 100 brands:", round(top_100_pct, 1), "% of spend")
+}
+```
+
+---
+
+# 4. Geographic Patterns
+
+## 4.1 Spending by State
+
+```{r state-spend, fig.height=8}
+state_spend <- dt[GEO_TYPE == "STATE" & PERIOD_TYPE == "MONTH", .(
+  Total_Spend = sum(SPEND_AMOUNT, na.rm = TRUE)
+), by = GEO][order(-Total_Spend)]
+
+ggplot(state_spend[1:30], aes(x = reorder(GEO, Total_Spend), y = Total_Spend / 1e9)) +
+  geom_col(fill = "steelblue", alpha = 0.8) +
+  coord_flip() +
+  labs(
+    title = "Top 30 States by Consumer Spend",
+    subtitle = "Monthly data aggregated",
+    x = NULL,
+    y = "Total Spend ($ Billions)"
+  )
+```
+
+## 4.2 Spending by Census Region
+
+```{r region-spend, fig.height=4}
+region_spend <- dt[GEO_TYPE == "CENSUS_REGION" & PERIOD_TYPE == "MONTH", .(
+  Total_Spend = sum(SPEND_AMOUNT, na.rm = TRUE)
+), by = GEO][order(-Total_Spend)]
+
+ggplot(region_spend, aes(x = reorder(GEO, Total_Spend), y = Total_Spend / 1e9, fill = GEO)) +
+  geom_col(alpha = 0.8) +
+  coord_flip() +
+  labs(
+    title = "Spending by Census Region",
+    x = NULL,
+    y = "Total Spend ($ Billions)"
+  ) +
+  scale_fill_brewer(palette = "Set2", guide = "none")
+```
+
+## 4.3 Top CSAs (Metro Areas)
+
+```{r csa-spend}
+csa_spend <- dt[GEO_TYPE == "CSA" & PERIOD_TYPE == "MONTH", .(
+  Total_Spend = sum(SPEND_AMOUNT, na.rm = TRUE),
+  N_Brands = uniqueN(BRAND_ID)
+), by = GEO][order(-Total_Spend)]
+
+csa_spend[1:25] %>%
+  mutate(
+    Total_Spend = paste0("$", format(round(Total_Spend / 1e9, 2), big.mark = ","), "B"),
+    N_Brands = format(N_Brands, big.mark = ",")
+  ) %>%
+  kable(caption = "Top 25 CSAs by Consumer Spend") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+---
+
+# 5. Temporal Trends
+
+## 5.1 National Spending Over Time
+
+```{r national-trend, fig.height=5}
+national_monthly <- dt[GEO_TYPE == "TOTAL_US" & PERIOD_TYPE == "MONTH", .(
+  Total_Spend = sum(SPEND_AMOUNT, na.rm = TRUE),
+  Total_Trans = sum(TRANS_COUNT, na.rm = TRUE),
+  N_Brands = uniqueN(BRAND_ID)
+), by = .(PERIOD, PERIOD_START_DT)][order(PERIOD_START_DT)]
+
+ggplot(national_monthly, aes(x = PERIOD_START_DT, y = Total_Spend / 1e9)) +
+  geom_line(color = "steelblue", linewidth = 1) +
+  geom_point(color = "steelblue", size = 2) +
+  labs(
+    title = "National Consumer Spending Over Time",
+    subtitle = "Monthly aggregates",
+    x = "Month",
+    y = "Total Spend ($ Billions)"
+  ) +
+  scale_x_date(date_labels = "%b %Y", date_breaks = "3 months") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## 5.2 Year-over-Year Growth
+
+```{r yoy-growth, fig.height=5}
+yoy_data <- dt[GEO_TYPE == "TOTAL_US" & PERIOD_TYPE == "MONTH" &
+               !is.na(YA_SPEND_AMOUNT) & YA_SPEND_AMOUNT > 0, .(
+  Current_Spend = sum(SPEND_AMOUNT, na.rm = TRUE),
+  YA_Spend = sum(YA_SPEND_AMOUNT, na.rm = TRUE)
+), by = .(PERIOD, PERIOD_START_DT)]
+
+yoy_data[, YoY_Growth := (Current_Spend - YA_Spend) / YA_Spend * 100]
+
+if (nrow(yoy_data) > 0) {
+  ggplot(yoy_data, aes(x = PERIOD_START_DT, y = YoY_Growth)) +
+    geom_col(aes(fill = YoY_Growth > 0), alpha = 0.8) +
+    geom_hline(yintercept = 0, color = "black") +
+    labs(
+      title = "Year-over-Year Spending Growth",
+      subtitle = "National monthly data",
+      x = "Month",
+      y = "YoY Growth (%)"
+    ) +
+    scale_fill_manual(values = c("TRUE" = "forestgreen", "FALSE" = "firebrick"), guide = "none") +
+    scale_x_date(date_labels = "%b %Y", date_breaks = "3 months") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+} else {
+  cat("Insufficient YoY data in sample files")
+}
+```
+
+## 5.3 Quarterly Patterns
+
+```{r quarterly-trend, fig.height=5}
+quarterly <- dt[GEO_TYPE == "TOTAL_US" & PERIOD_TYPE == "CAL_QTR", .(
+  Total_Spend = sum(SPEND_AMOUNT, na.rm = TRUE)
+), by = .(PERIOD, PERIOD_START_DT)][order(PERIOD_START_DT)]
+
+if (nrow(quarterly) > 0) {
+  ggplot(quarterly, aes(x = PERIOD_START_DT, y = Total_Spend / 1e9)) +
+    geom_col(fill = "steelblue", alpha = 0.8) +
+    labs(
+      title = "Quarterly Consumer Spending",
+      x = "Quarter",
+      y = "Total Spend ($ Billions)"
+    ) +
+    scale_x_date(date_labels = "%b %Y", date_breaks = "3 months") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+```
+
+---
+
+# 6. Brand Deep Dives
+
+## 6.1 Top 10 Brands Over Time
+
+```{r brand-timeseries, fig.height=8}
+top_10_brands <- brand_totals[1:10, BRAND_NAME]
+
+brand_ts <- dt[BRAND_NAME %in% top_10_brands & GEO_TYPE == "TOTAL_US" & PERIOD_TYPE == "MONTH", .(
+  Spend = sum(SPEND_AMOUNT, na.rm = TRUE)
+), by = .(BRAND_NAME, PERIOD_START_DT)][order(BRAND_NAME, PERIOD_START_DT)]
+
+ggplot(brand_ts, aes(x = PERIOD_START_DT, y = Spend / 1e9, color = BRAND_NAME)) +
+  geom_line(linewidth = 1) +
+  facet_wrap(~BRAND_NAME, scales = "free_y", ncol = 2) +
+  labs(
+    title = "Top 10 Brands: Monthly Spending Trends",
+    x = "Month",
+    y = "Spend ($ Billions)"
+  ) +
+  scale_x_date(date_labels = "%b %y", date_breaks = "6 months") +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 8)
+  )
+```
+
+## 6.2 Brand Geographic Distribution
+
+```{r brand-geo, fig.height=6}
+top_5_brands <- brand_totals[1:5, BRAND_NAME]
+
+brand_state <- dt[BRAND_NAME %in% top_5_brands & GEO_TYPE == "STATE" & PERIOD_TYPE == "MONTH", .(
+  Total_Spend = sum(SPEND_AMOUNT, na.rm = TRUE)
+), by = .(BRAND_NAME, GEO)]
+
+brand_state[, Brand_Total := sum(Total_Spend), by = BRAND_NAME]
+brand_state[, Pct_of_Brand := Total_Spend / Brand_Total * 100]
+
+top_states <- brand_state[, .(Total = sum(Total_Spend)), by = GEO][order(-Total)][1:10, GEO]
+
+brand_state[GEO %in% top_states] %>%
+  ggplot(aes(x = GEO, y = Pct_of_Brand, fill = BRAND_NAME)) +
+  geom_col(position = "dodge", alpha = 0.8) +
+  labs(
+    title = "Top 5 Brands: Geographic Distribution",
+    subtitle = "% of brand's total spend by state (top 10 states)",
+    x = "State",
+    y = "% of Brand Total",
+    fill = "Brand"
+  ) +
+  scale_fill_brewer(palette = "Set1") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+---
+
+# 7. Entity Resolution & Project Oakland Linkage
+
+## 7.1 The Linkage Challenge
+
+To use Consumer Edge data as a dependent variable in Project Oakland, we need to link brands to:
+
+1. **Advan foot traffic data** (via brand names or PLACEKEY)
+2. **Politics at Work employee data** (via employer names)
+
+**Challenge:** Brand names may differ across datasets:
+- Consumer Edge: "MCDONALD'S"
+- Advan: "McDonald's", "McDonalds", "McDonald's Restaurant"
+- Politics at Work: "McDonald's Corporation"
+
+## 7.2 Brand Name Sample
+
+```{r brand-names-sample}
+brand_sample <- dt[, .(N = .N), by = BRAND_NAME][order(-N)][1:50, BRAND_NAME]
+
+data.frame(Brand_Name = brand_sample) %>%
+  kable(caption = "Sample Brand Names (Top 50 by frequency)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) %>%
+  scroll_box(height = "400px")
+```
+## 7.3 Proposed Linkage Strategy
+
+### Step 1: Standardize brand names
+- Convert to uppercase
+- Remove punctuation and extra spaces
+- Handle common variations (Corp, Inc, LLC, etc.)
+
+### Step 2: Direct matching
+- Exact match after standardization
+- High confidence matches
+
+### Step 3: Fuzzy matching
+- For remaining unmatched brands
+- Use string distance algorithms (Jaro-Winkler, Levenshtein)
+- Manual review of close matches
+
+### Step 4: Manual curation
+- Industry-specific knowledge for major brands
+- Build crosswalk table for repeated use
+
+## 7.4 Research Design Considerations
+
+**As a Dependent Variable:**
+
+| Design | Identification | Data Requirement |
+|--------|---------------|------------------|
+| Cross-sectional | Compare aligned vs misaligned firms | Brand-level spending at one point |
+| Panel | Within-brand changes over time | Full time series per brand |
+| Diff-in-diff | Response to salience shocks (elections, boycotts) | Pre/post event spending |
+| Geographic | Same brand, different markets | Brand × geography panel |
+
+**Variation Available:**
+- **Time:** Q4 2022 - Q2 2025 (covers 2024 election)
+- **Geography:** State, CSA, region levels
+- **Granularity:** Monthly, quarterly, rolling periods
+
+## 7.5 Limitations
+
+1. **Panel composition:** Consumer Edge panel may not be representative of all consumers
+2. **Brand coverage:** Not all brands in Advan/PaW will appear in Consumer Edge
+3. **Aggregation:** Data is brand × geography × time, not POI-level
+4. **Selection:** Brands with credit/debit transactions only (excludes cash-heavy businesses)
+
+---
+
+# 8. Summary & Next Steps
+
+## Key Findings
+
+1. **Data scale:** ~130M+ rows covering `r format(n_brands, big.mark = ",")` brands across multiple geographies
+2. **Time coverage:** ~2.5 years including 2024 election period
+3. **Concentration:** Top brands account for majority of spending (amenable to focused analysis)
+4. **Geographic detail:** Available at state, CSA, and regional levels
+
+## Recommended Next Steps
+
+1. **Full data processing:** Load all 64 files via SLURM job for comprehensive brand inventory
+2. **Brand matching:** Build crosswalk to Advan brands and Politics at Work employers
+3. **Panel construction:** Create brand × month panel for regression analysis
+4. **Event study:** Design analysis around 2024 election as salience shock
+
+---
+
+# Appendix
+
+## A.1 Session Info
+
+```{r session-info}
+sessionInfo()
+```
+
+## A.2 Data File List
+
+```{r file-list}
+data.frame(File = basename(files)) %>%
+  kable(caption = paste("All", n_total_files, "Data Files")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) %>%
+  scroll_box(height = "300px")
+```
+
+---
+
+*Report generated: `r Sys.time()`*
+
+*Data source: Consumer Edge "Brand and Geography Cohort Breakout USA 1" via Dewey Data*
