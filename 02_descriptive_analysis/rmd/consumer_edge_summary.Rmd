@@ -30,6 +30,7 @@ library(scales)
 library(knitr)
 library(kableExtra)
 library(lubridate)
+library(arrow)
 
 theme_set(theme_minimal(base_size = 12) +
   theme(
@@ -43,7 +44,7 @@ options(scipen = 999)
 
 # Executive Summary
 
-This report summarizes the **Consumer Edge "Brand and Geography Cohort Breakout USA 1"** dataset, a consumer spending panel covering credit/debit card transactions aggregated by brand, geography, and time period. The data spans Q4 2022 through Q2 2025 with ~130M+ rows across 64 files.
+This report summarizes the **Consumer Edge "Brand and Geography Cohort Breakout" (Combined Panels 1+2)** dataset, a consumer spending panel covering credit/debit card transactions aggregated by brand, geography, and time period. The data spans Q4 2022 through Q2 2025 with ~208M rows in a consolidated parquet file.
 
 **Key Use Case for Project Oakland:** This data provides brand-level consumer spending as a potential **dependent variable** to measure whether employee-consumer partisan alignment affects actual purchasing behavior.
 
@@ -69,20 +70,18 @@ This report summarizes the **Consumer Edge "Brand and Geography Cohort Breakout 
 # 1. Data Loading
 
 ```{r load-data}
-data_dir <- "/global/scratch/users/maxkagan/01_foot_traffic_location/consumer_edge_data_2026-01-12/brand-and-geography-cohort-breakout-usa-1"
+parquet_path <- "/global/scratch/users/maxkagan/01_foot_traffic_location/consumer_edge_combined_2026-01-12/parquet/consumer_edge_brand_geo_combined.parquet"
 
-files <- list.files(data_dir, pattern = "\\.csv\\.gz$", full.names = TRUE)
-n_total_files <- length(files)
-
-dt <- rbindlist(lapply(files, fread), fill = TRUE)
+dt <- as.data.table(read_parquet(parquet_path))
 
 n_rows_sample <- nrow(dt)
 n_cols <- ncol(dt)
+file_size_gb <- round(file.info(parquet_path)$size / 1e9, 2)
 ```
 
-**Data Source:** `r data_dir`
+**Data Source:** `r parquet_path`
 
-- **Total files loaded:** `r n_total_files`
+- **File size:** `r file_size_gb` GB (parquet format)
 - **Total rows:** `r format(n_rows_sample, big.mark = ",")`
 - **Columns:** `r n_cols`
 
@@ -881,10 +880,9 @@ data.frame(
 
 ## Recommended Next Steps
 
-1. **Full data processing:** Load all 64 files via SLURM job for comprehensive brand inventory
-2. **Brand matching:** Build crosswalk to Advan brands and Politics at Work employers
-3. **Panel construction:** Create brand × month panel for regression analysis
-4. **Event study:** Design analysis around 2024 election as salience shock
+1. **Brand matching:** Build crosswalk to Advan brands and Politics at Work employers
+2. **Panel construction:** Create brand × month panel for regression analysis
+3. **Event study:** Design analysis around 2024 election as salience shock
 
 ---
 
@@ -896,17 +894,25 @@ data.frame(
 sessionInfo()
 ```
 
-## A.2 Data File List
+## A.2 Data Source
 
-```{r file-list}
-data.frame(File = basename(files)) %>%
-  kable(caption = paste("All", n_total_files, "Data Files")) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) %>%
-  scroll_box(height = "300px")
+```{r data-source}
+data.frame(
+  Property = c("File", "Format", "Size", "Rows", "Columns"),
+  Value = c(
+    basename(parquet_path),
+    "Apache Parquet",
+    paste0(file_size_gb, " GB"),
+    format(n_rows_sample, big.mark = ","),
+    n_cols
+  )
+) %>%
+  kable(caption = "Data Source Details") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
 ```
 
 ---
 
 *Report generated: `r Sys.time()`*
 
-*Data source: Consumer Edge "Brand and Geography Cohort Breakout USA 1" via Dewey Data*
+*Data source: Consumer Edge "Brand and Geography Cohort Breakout" (Combined 1+2) via Dewey Data (parquet format)*
