@@ -73,11 +73,12 @@ The election data provides estimated vote counts at the Census Block Group level
 
 ### 1.3 Metropolitan Statistical Area Crosswalk
 
-**Source:** U.S. Census Bureau Core Based Statistical Area (CBSA) Delineation File
+**Source:** National Bureau of Economic Research (NBER) CBSA-to-FIPS County Crosswalk
+**Original data:** U.S. Census Bureau Core Based Statistical Area (CBSA) Delineation File
 **Version:** 2023 delineations
-**URL:** `https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2023/delineation-files/list1_2023.xls`
+**URL:** `https://data.nber.org/cbsa-csa-fips-county-crosswalk/2023/cbsa2fipsxw_2023.csv`
 
-This crosswalk maps 5-digit county FIPS codes to CBSA codes and titles (Metropolitan Statistical Area names). We use this to assign each POI to its MSA based on the county portion of the POI's CBG code.
+This crosswalk maps 5-digit county FIPS codes to CBSA codes and titles (Metropolitan Statistical Area names). We use this to assign each POI to its MSA based on the county portion of the POI's CBG code. The NBER provides a cleaned CSV version of the Census Bureau's original Excel delineation file, facilitating programmatic access.
 
 ---
 
@@ -88,8 +89,8 @@ This crosswalk maps 5-digit county FIPS codes to CBSA codes and titles (Metropol
 **Purpose:** Create a lookup table mapping county FIPS codes to Metropolitan Statistical Area names.
 
 **Process:**
-1. Download the Census Bureau CBSA delineation Excel file
-2. Extract relevant columns: CBSA Code, CBSA Title, FIPS State Code, FIPS County Code
+1. Download the NBER CBSA-to-FIPS crosswalk CSV file (derived from Census Bureau delineations)
+2. Extract relevant columns: `cbsacode`, `cbsatitle`, `fipsstatecode`, `fipscountycode`, `metropolitanmicropolitanstatis`
 3. Construct 5-digit county FIPS code by concatenating:
    - 2-digit state FIPS (zero-padded)
    - 3-digit county FIPS (zero-padded)
@@ -102,9 +103,11 @@ This crosswalk maps 5-digit county FIPS codes to CBSA codes and titles (Metropol
 | `cbsa_title` | string | Full MSA name (e.g., "San Francisco-Oakland-Berkeley, CA") |
 | `state_fips` | string | 2-digit state FIPS code |
 | `county_fips` | string | 3-digit county FIPS code |
+| `metro_micro` | string | Classification ("Metropolitan Statistical Area" or "Micropolitan Statistical Area") |
 | `county_fips_full` | string | 5-digit combined county FIPS code |
 
 **Output file:** `cbsa_crosswalk.parquet`
+**Records:** 1,915 county-to-CBSA mappings covering 935 unique CBSAs
 
 ### 2.2 Steps 1-2: Construct National CBG Partisan Lean Lookup
 
@@ -542,7 +545,7 @@ All processing scripts are available at: `[GitHub repository URL]`
 
 - **Advan foot traffic data:** Requires commercial license from Advan/Dewey
 - **Election data:** Available from [source]
-- **CBSA crosswalk:** Publicly available from U.S. Census Bureau
+- **CBSA crosswalk:** Publicly available from NBER (`https://data.nber.org/cbsa-csa-fips-county-crosswalk/`), derived from U.S. Census Bureau delineation files
 
 ### 8.3 Computational Requirements
 

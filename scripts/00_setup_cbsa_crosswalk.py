@@ -3,7 +3,7 @@
 Step 0: Download and process CBSA (Metropolitan Statistical Area) crosswalk.
 
 This script:
-1. Downloads the Census Bureau CBSA delineation file
+1. Downloads the NBER CBSA-to-FIPS county crosswalk (sourced from Census Bureau)
 2. Creates a county FIPS → CBSA code/title mapping
 3. Saves as parquet for fast lookup
 
@@ -25,23 +25,20 @@ logger = logging.getLogger(__name__)
 OUTPUT_DIR = Path("/global/scratch/users/maxkagan/project_oakland/inputs")
 OUTPUT_FILE = OUTPUT_DIR / "cbsa_crosswalk.parquet"
 
-CBSA_URL = "https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2023/delineation-files/list1_2023.xls"
+CBSA_URL = "https://data.nber.org/cbsa-csa-fips-county-crosswalk/2023/cbsa2fipsxw_2023.csv"
 
 
 def download_cbsa_delineation():
-    """Download CBSA delineation file from Census Bureau."""
-    logger.info(f"Downloading CBSA delineation from {CBSA_URL}")
+    """Download CBSA crosswalk CSV from NBER."""
+    logger.info(f"Downloading CBSA crosswalk from {CBSA_URL}")
 
     try:
         response = requests.get(CBSA_URL, timeout=60)
         response.raise_for_status()
 
-        df = pd.read_excel(
-            io.BytesIO(response.content),
-            skiprows=2,
-            dtype=str
-        )
+        df = pd.read_csv(io.StringIO(response.text), dtype=str)
         logger.info(f"Downloaded {len(df)} rows")
+        logger.info(f"Columns: {df.columns.tolist()}")
         return df
     except Exception as e:
         logger.error(f"Failed to download: {e}")
@@ -52,43 +49,13 @@ def process_cbsa_crosswalk(df):
     """Process CBSA data into county → CBSA mapping."""
     logger.info("Processing CBSA crosswalk...")
 
-    expected_cols = ['CBSA Code', 'CBSA Title', 'FIPS State Code', 'FIPS County Code']
+    result = df[['cbsacode', 'cbsatitle', 'fipsstatecode', 'fipscountycode']].copy()
 
-    actual_cols = df.columns.tolist()
-    logger.info(f"Columns found: {actual_cols[:10]}...")
-
-    col_mapping = {}
-    for col in actual_cols:
-        col_lower = col.lower()
-        if 'cbsa code' in col_lower:
-            col_mapping['cbsa_code'] = col
-        elif 'cbsa title' in col_lower:
-            col_mapping['cbsa_title'] = col
-        elif 'fips state' in col_lower or col_lower == 'state code':
-            col_mapping['state_fips'] = col
-        elif 'fips county' in col_lower or col_lower == 'county code':
-            col_mapping['county_fips'] = col
-        elif 'metropolitan/micropolitan' in col_lower:
-            col_mapping['metro_micro'] = col
-
-    logger.info(f"Column mapping: {col_mapping}")
-
-    if len(col_mapping) < 4:
-        logger.error(f"Could not find all required columns. Found: {col_mapping}")
-        return None
-
-    result = df[[
-        col_mapping['cbsa_code'],
-        col_mapping['cbsa_title'],
-        col_mapping['state_fips'],
-        col_mapping['county_fips']
-    ]].copy()
-
-    if 'metro_micro' in col_mapping:
-        result['metro_micro'] = df[col_mapping['metro_micro']]
+    if 'metropolitanmicropolitanstatis' in df.columns:
+        result['metro_micro'] = df['metropolitanmicropolitanstatis']
 
     result.columns = ['cbsa_code', 'cbsa_title', 'state_fips', 'county_fips'] + (
-        ['metro_micro'] if 'metro_micro' in col_mapping else []
+        ['metro_micro'] if 'metropolitanmicropolitanstatis' in df.columns else []
     )
 
     result = result.dropna(subset=['cbsa_code', 'state_fips', 'county_fips'])
