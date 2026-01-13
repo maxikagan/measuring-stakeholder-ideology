@@ -64,15 +64,18 @@ Fall 2026 job market paper for SMJ/Organization Science/Management Science/ASQ
    - For Bartik IV and baseline visitor composition
 
 3. **CBG-Level Election Results**:
-   - Location: `/global/scratch/users/maxkagan/election_results_geocoded/`
-   - Format: Zipped state files with Block Group level vote estimates
+   - Location: `/global/scratch/users/maxkagan/02_election_voter/election_results_geocoded/`
+   - Files: `bg-2016-RLCR.csv` and `bg-2020-RLCR.csv` (in Main Method zip)
+   - Format: Block Group level vote estimates for 2016 and 2020 elections
 
 4. **Politics at Work**:
    - Full microdata: 45M individuals with work histories
    - Can aggregate by MSA × employer × year
 
 ### Key Decisions
-- Use `two_party_rep_share_2020` = Trump / (Biden + Trump)
+- **Election data**: Include both 2016 and 2020 CBG-level election results for all POIs
+  - Primary: `two_party_rep_share_2020` = Trump / (Biden + Trump)
+  - Secondary/robustness: `two_party_rep_share_2016` = Trump / (Clinton + Trump)
 - Output format: Long (placekey x month rows)
 - CBG method: Main Method (RLCR)
 - Entity resolution: Maximum coverage (public + private, branded + unbranded)
