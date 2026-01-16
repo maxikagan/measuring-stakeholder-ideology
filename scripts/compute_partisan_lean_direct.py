@@ -24,7 +24,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-PROJECT_DIR = Path("/global/scratch/users/maxkagan/project_oakland")
+PROJECT_DIR = Path("/global/scratch/users/maxkagan/measuring_stakeholder_ideology")
 FILE_LIST_PATH = PROJECT_DIR / "inputs" / "advan_file_list.txt"
 CBG_LOOKUP_PATH = PROJECT_DIR / "inputs" / "cbg_partisan_lean_national_both_years.parquet"
 CBSA_CROSSWALK_PATH = PROJECT_DIR / "inputs" / "cbsa_crosswalk.parquet"
@@ -34,6 +34,7 @@ COLUMNS_TO_READ = [
     'PLACEKEY', 'DATE_RANGE_START', 'BRANDS',
     'TOP_CATEGORY', 'SUB_CATEGORY', 'NAICS_CODE',
     'CITY', 'REGION', 'POI_CBG', 'PARENT_PLACEKEY',
+    'LATITUDE', 'LONGITUDE',
     'MEDIAN_DWELL', 'VISITOR_HOME_CBGS', 'RAW_VISITOR_COUNTS'
 ]
 

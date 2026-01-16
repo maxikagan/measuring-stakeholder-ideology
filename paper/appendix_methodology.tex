@@ -129,3 +129,436 @@ The pipeline is implemented on the UC Berkeley Savio HPC cluster using SLURM for
     \item \textbf{Ecological inference:} We observe aggregate CBG-level voting patterns, not individual preferences.
     \item \textbf{Home location inference:} The ``home'' CBG is inferred from nighttime location patterns and may not reflect current residence for all individuals.
 \end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EXCESS PARTISAN LEAN METHODOLOGY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Methodological Appendix: Excess Partisan Lean via Gravity Model}
+\label{sec:appendix_excess_partisan_lean}
+
+\subsection{Overview}
+
+This appendix describes the methodology for computing \textit{excess partisan lean}---the deviation of a POI's visitor partisan composition from what would be expected given its geographic location and business category. While raw partisan lean (Section~\ref{sec:appendix_methodology}) captures the absolute political composition of visitors, excess partisan lean isolates brand- and location-specific effects by controlling for the partisan composition of nearby similar businesses.
+
+The key insight is that a Starbucks in rural Texas will naturally have more Republican visitors than a Starbucks in San Francisco simply due to geography. Excess partisan lean asks: conditional on location and category, does this specific POI attract visitors who are more or less Republican than expected?
+
+\subsection{Conceptual Framework}
+
+We define excess partisan lean as:
+
+\begin{equation}
+\text{excess\_rep\_lean}_{i,m} = \text{rep\_lean}_{i,m} - \mathbb{E}[\text{rep\_lean}_{i,m} \mid \text{location}_i, \text{category}_i]
+\end{equation}
+
+where $i$ indexes POIs and $m$ indexes months. The expected partisan lean $\mathbb{E}[\text{rep\_lean} \mid \text{location}, \text{category}]$ is estimated using a gravity model that computes a distance-weighted average of partisan lean for nearby POIs in the same NAICS 4-digit category.
+
+\subsection{Gravity Model Specification}
+
+\subsubsection{Distance Weighting}
+
+For each POI $i$, we compute expected partisan lean as a weighted average of partisan lean from nearby POIs $j$ in the same category:
+
+\begin{equation}
+\mathbb{E}[\text{rep\_lean}_i] = \frac{\sum_{j \in N_i} w_{ij} \cdot \text{rep\_lean}_j}{\sum_{j \in N_i} w_{ij}}
+\end{equation}
+
+where $N_i$ is the set of neighbor POIs (same NAICS 4-digit category, excluding POI $i$ itself) and $w_{ij}$ is a distance-based weight.
+
+We use an inverse distance weighting function with exponential decay:
+
+\begin{equation}
+w_{ij} = \exp\left(-\frac{d_{ij}}{\lambda}\right)
+\end{equation}
+
+where $d_{ij}$ is the great-circle distance (in kilometers) between POI $i$ and POI $j$, and $\lambda$ is a decay parameter controlling the spatial scale of the weighting. Larger $\lambda$ values give more weight to distant POIs; smaller values focus on immediate neighbors.
+
+\subsubsection{Parameter Selection}
+
+We set $\lambda = 50$ km as the default decay parameter, meaning that a POI 50 km away receives weight $e^{-1} \approx 0.37$ relative to a POI at distance zero. This balances two considerations:
+
+\begin{itemize}
+    \item \textbf{Local relevance:} Competitors and similar businesses within a metropolitan area should receive substantial weight
+    \item \textbf{Sufficient sample size:} Especially in rural areas, the radius must be large enough to include multiple category neighbors
+\end{itemize}
+
+We also impose a maximum distance cutoff of $d_{\max} = 200$ km to exclude POIs that are too geographically distant to be relevant comparisons.
+
+\subsubsection{Minimum Neighbor Threshold}
+
+To ensure robust baseline estimates, we require a minimum of $n_{\min} = 5$ neighbor POIs within the maximum distance. POIs that do not meet this threshold are flagged with a data quality indicator but are still assigned an expected value based on available neighbors (or set to missing if no neighbors exist).
+
+\subsection{Category Definition: NAICS 4-Digit}
+
+\subsubsection{Rationale}
+
+We define ``similar businesses'' using the 4-digit North American Industry Classification System (NAICS) code. The Advan data includes a \texttt{top\_category} field, but empirical analysis reveals a perfect 1:1 mapping between \texttt{top\_category} and NAICS 4-digit codes:
+
+\begin{itemize}
+    \item 216 unique \texttt{top\_category} values
+    \item 216 unique NAICS 4-digit values
+    \item Each \texttt{top\_category} maps to exactly one NAICS 4-digit, and vice versa
+\end{itemize}
+
+We use NAICS 4-digit rather than \texttt{top\_category} for three reasons:
+
+\begin{enumerate}
+    \item \textbf{Replicability:} NAICS codes are a federal standard that other researchers can replicate without access to Advan's proprietary category labels
+    \item \textbf{Extensibility:} NAICS codes can be aggregated to 3-digit or 2-digit levels for robustness checks
+    \item \textbf{External linkage:} NAICS codes facilitate linkage to other datasets (e.g., Census Business Patterns, BLS employment data)
+\end{enumerate}
+
+\subsubsection{Category Examples}
+
+Table~\ref{tab:naics_examples} illustrates NAICS 4-digit categories and their POI coverage.
+
+\begin{table}[htbp]
+\centering
+\caption{Selected NAICS 4-Digit Categories}
+\label{tab:naics_examples}
+\begin{tabular}{llr}
+\toprule
+NAICS & Description & POI Count \\
+\midrule
+7225 & Restaurants and Other Eating Places & 789,319 \\
+6211 & Offices of Physicians & 520,606 \\
+8121 & Personal Care Services & 499,142 \\
+5411 & Legal Services & 466,220 \\
+4451 & Grocery Stores & 148,504 \\
+4471 & Gasoline Stations & 131,612 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Geographic Coordinates}
+
+\subsubsection{Coordinate Source}
+
+We derive POI coordinates from the Placekey identifier using the Placekey Python library. Each Placekey contains an encoded H3 hexagonal index that can be converted to latitude/longitude coordinates. Specifically:
+
+\begin{enumerate}
+    \item Parse the Placekey to extract the ``where'' component (after the @ symbol)
+    \item Convert to H3 index using the Placekey library
+    \item Compute the centroid of the H3 hexagon
+\end{enumerate}
+
+This provides coordinates with resolution of approximately 150 meters (H3 resolution 10), which is sufficient for computing inter-POI distances.
+
+\subsubsection{Distance Calculation}
+
+We compute great-circle distances using the Haversine formula:
+
+\begin{equation}
+d_{ij} = 2R \cdot \arcsin\left(\sqrt{\sin^2\left(\frac{\phi_j - \phi_i}{2}\right) + \cos(\phi_i)\cos(\phi_j)\sin^2\left(\frac{\lambda_j - \lambda_i}{2}\right)}\right)
+\end{equation}
+
+where $R = 6371$ km is the Earth's mean radius, $\phi$ denotes latitude in radians, and $\lambda$ denotes longitude in radians.
+
+\subsection{Computational Implementation}
+
+\subsubsection{Spatial Indexing}
+
+Naive computation of all pairwise distances for 19.8 million POIs would require $O(n^2) \approx 4 \times 10^{14}$ distance calculations, which is computationally infeasible. We use spatial indexing to reduce complexity:
+
+\begin{enumerate}
+    \item \textbf{Build category-specific spatial indices:} For each NAICS 4-digit category, construct a KD-tree or ball tree index of POI coordinates
+    \item \textbf{Radius query:} For each POI, query the spatial index for neighbors within $d_{\max} = 200$ km
+    \item \textbf{Compute weights:} Calculate distances and weights only for the returned neighbors
+\end{enumerate}
+
+This reduces complexity to approximately $O(n \cdot k \cdot \log n)$ where $k$ is the average number of neighbors per POI.
+
+\subsubsection{Parallelization}
+
+The computation is embarrassingly parallel across POIs. We implement this as a SLURM array job, partitioning POIs by NAICS 4-digit category to ensure all relevant neighbors are available within each partition.
+
+\subsection{Output Variables}
+
+For each POI-month observation, we output:
+
+\begin{itemize}
+    \item \texttt{expected\_rep\_lean\_2020}: Gravity-model predicted partisan lean (2020 election basis)
+    \item \texttt{expected\_rep\_lean\_2016}: Gravity-model predicted partisan lean (2016 election basis)
+    \item \texttt{excess\_rep\_lean\_2020}: Actual minus expected (2020)
+    \item \texttt{excess\_rep\_lean\_2016}: Actual minus expected (2016)
+    \item \texttt{n\_neighbors}: Number of same-category POIs within $d_{\max}$
+    \item \texttt{sum\_weights}: Sum of distance weights (measure of neighbor density)
+    \item \texttt{nearest\_neighbor\_km}: Distance to nearest same-category POI
+\end{itemize}
+
+\subsection{Interpretation}
+
+\begin{itemize}
+    \item \textbf{Excess $> 0$:} The POI attracts visitors who are more Republican than expected given its location and category
+    \item \textbf{Excess $< 0$:} The POI attracts visitors who are more Democratic than expected
+    \item \textbf{Excess $\approx 0$:} The POI's visitor composition matches expectations
+\end{itemize}
+
+For example, if a Starbucks in Dallas has $\text{rep\_lean} = 0.52$ but the gravity model predicts $\mathbb{E}[\text{rep\_lean}] = 0.48$ based on nearby coffee shops, then $\text{excess\_rep\_lean} = +0.04$, indicating this location attracts slightly more Republican visitors than typical for coffee shops in the Dallas area.
+
+\subsection{Robustness Checks}
+
+We recommend the following robustness checks:
+
+\begin{enumerate}
+    \item \textbf{Decay parameter sensitivity:} Re-estimate with $\lambda \in \{25, 100, 200\}$ km
+    \item \textbf{Category granularity:} Compare results using NAICS 3-digit (broader) and NAICS 6-digit (narrower) categories
+    \item \textbf{Minimum neighbor threshold:} Restrict analysis to POIs with $n \geq 10$ or $n \geq 20$ neighbors
+    \item \textbf{Temporal stability:} Compute category-level averages using lagged data to avoid simultaneity
+\end{enumerate}
+
+\subsection{Limitations}
+
+\begin{enumerate}
+    \item \textbf{Category boundaries:} NAICS 4-digit may group heterogeneous businesses (e.g., fine dining and fast food both in 7225)
+    \item \textbf{Sparse rural areas:} Some POIs have few or no same-category neighbors within the maximum distance
+    \item \textbf{New entrants:} Recently opened POIs may lack sufficient monthly observations for stable baseline estimation
+    \item \textbf{Distance metric:} Great-circle distance ignores natural barriers (rivers, mountains) and transportation networks that affect actual competitive overlap
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ENTITY RESOLUTION METHODOLOGY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Methodological Appendix: Entity Resolution for Employee Ideology Linkage}
+\label{sec:appendix_entity_resolution}
+
+\subsection{Overview}
+
+This appendix describes the methodology for linking employer records from the Politics at Work (PAW) dataset to points of interest in the Advan foot traffic data. This linkage enables analysis of employee partisan composition alongside visitor partisan composition, allowing researchers to study the relationship between a firm's workforce ideology and its customer base.
+
+The core challenge is \textit{entity resolution}: determining when a company name in PAW (e.g., ``Walmart Inc'') refers to the same entity as a brand in Advan (e.g., ``Walmart''). We employ a two-tier matching strategy that combines exact identifier matching with fuzzy string matching using neural text embeddings.
+
+\subsection{Data Sources}
+
+\subsubsection{Politics at Work (PAW) Employment Records}
+
+The PAW dataset contains employment history records for approximately 45 million individuals in the United States, with the following relevant fields:
+
+\begin{itemize}
+    \item \texttt{rcid}: Unique company identifier in PAW
+    \item \texttt{company\_name}: Employer name as reported (e.g., ``Apple Inc.'', ``APPLE COMPUTER'')
+    \item \texttt{ticker}: Stock ticker symbol (available for $\sim$0.2\% of records)
+    \item \texttt{naics\_code}: NAICS industry code (available for $\sim$96\% of records)
+    \item \texttt{city}, \texttt{state}: Employer location
+\end{itemize}
+
+After deduplication, PAW contains approximately 26.3 million unique company records.
+
+\subsubsection{Advan POI Data}
+
+The Advan Places of Interest (POI) dataset contains location-level data with the following relevant fields:
+
+\begin{itemize}
+    \item \texttt{PLACEKEY}: Unique POI identifier
+    \item \texttt{SAFEGRAPH\_BRAND\_IDS}: Brand identifier (populated for chain locations)
+    \item \texttt{BRANDS}: Brand name (e.g., ``Starbucks'', ``Walmart'')
+    \item \texttt{LOCATION\_NAME}: Business name for non-chain locations
+    \item \texttt{STOCK\_SYMBOL}: Stock ticker for publicly traded brands
+    \item \texttt{NAICS\_CODE}: NAICS industry code
+    \item \texttt{LATITUDE}, \texttt{LONGITUDE}: Geographic coordinates
+\end{itemize}
+
+The U.S. POI data contains approximately 19.8 million locations:
+\begin{itemize}
+    \item \textbf{Branded POIs:} 2.35 million locations with \texttt{SAFEGRAPH\_BRAND\_IDS} populated, mapping to approximately 14,800 unique brands
+    \item \textbf{Singleton POIs:} 17.5 million locations without brand identifiers (independent businesses)
+\end{itemize}
+
+\subsection{Two-Tier Matching Strategy}
+
+We employ different matching strategies for branded and singleton POIs, reflecting the different challenges each presents.
+
+\subsubsection{Tier 1: National Brands}
+
+For POIs with brand identifiers, we match at the brand level (not location level). This is appropriate because a single PAW company record (e.g., ``Starbucks Corporation'') corresponds to all Starbucks locations nationwide.
+
+\paragraph{Step 1: Exact Ticker Matching}
+
+For PAW records with ticker symbols and Advan brands with stock symbols, we perform exact string matching:
+
+\begin{equation}
+\text{match}_{ij} = \mathbbm{1}[\texttt{PAW.ticker}_i = \texttt{Advan.STOCK\_SYMBOL}_j]
+\end{equation}
+
+This produces high-confidence matches for major public companies. We expect approximately 500--1,000 exact ticker matches.
+
+\paragraph{Step 2: Fuzzy Name Matching via Neural Embeddings}
+
+For remaining unmatched records, we use neural text embeddings to identify similar company names. The process is:
+
+\begin{enumerate}
+    \item \textbf{Generate embeddings:} For each unique company name in PAW and each brand name in Advan, compute a 1,536-dimensional embedding using OpenAI's \texttt{text-embedding-3-small} model
+    \item \textbf{Compute similarity:} Calculate cosine similarity between all PAW-Advan embedding pairs:
+    \begin{equation}
+    \text{sim}(i, j) = \frac{\mathbf{e}_i \cdot \mathbf{e}_j}{\|\mathbf{e}_i\| \|\mathbf{e}_j\|}
+    \end{equation}
+    where $\mathbf{e}_i$ and $\mathbf{e}_j$ are the embedding vectors for PAW company $i$ and Advan brand $j$
+    \item \textbf{Threshold:} Accept candidate matches where $\text{sim}(i,j) > 0.85$
+    \item \textbf{Tiebreaking:} When multiple candidates have similar scores (within 0.05 of the maximum), use Jaro-Winkler string distance as a secondary signal
+\end{enumerate}
+
+\paragraph{Rationale for Embedding-Based Matching}
+
+Traditional string matching methods (Levenshtein distance, Jaro-Winkler) struggle with semantically equivalent but textually different names:
+
+\begin{itemize}
+    \item ``Joe's Pizza'' $\approx$ ``Joe's Pizza Restaurant'' $\approx$ ``Joes Pizza Inc''
+    \item ``The Home Depot'' $\approx$ ``Home Depot'' $\approx$ ``HOME DEPOT INC''
+\end{itemize}
+
+Neural embeddings capture semantic similarity, recognizing that ``McDonald's Corporation'' and ``McDonalds'' refer to the same entity even though character-level edit distance is substantial.
+
+We use \texttt{text-embedding-3-small} rather than larger embedding models because:
+\begin{enumerate}
+    \item Company names are short strings (typically 2--5 words) where larger models provide minimal benefit
+    \item Cost is significantly lower (\$0.02 per million tokens vs. \$0.13 for \texttt{text-embedding-3-large})
+    \item Latency is lower, enabling faster processing
+\end{enumerate}
+
+\subsubsection{Tier 2: Singleton POIs (Location Blocking)}
+
+For POIs without brand identifiers, we match at the location level within geographic blocks. This is necessary because:
+
+\begin{itemize}
+    \item Singleton POIs represent independent businesses, not national chains
+    \item A ``Joe's Pizza'' in New York is almost certainly a different entity than ``Joe's Pizza'' in Los Angeles
+    \item Matching must respect geographic boundaries to avoid false positives
+\end{itemize}
+
+\paragraph{Blocking Strategy}
+
+We block matches by Metropolitan Statistical Area (MSA):
+
+\begin{enumerate}
+    \item Assign each Advan singleton POI to an MSA using its latitude/longitude coordinates
+    \item Extract unique PAW companies for each MSA from employment records
+    \item Perform fuzzy matching only within MSA blocks
+\end{enumerate}
+
+This reduces the matching problem from $O(n \times m)$ for all pairs to $O(k \times \bar{n} \times \bar{m})$ where $k$ is the number of MSAs and $\bar{n}$, $\bar{m}$ are average companies per MSA.
+
+\paragraph{Stricter Thresholds}
+
+Because singleton matching is more error-prone than brand matching, we apply stricter thresholds:
+
+\begin{itemize}
+    \item Cosine similarity threshold: 0.90 (vs. 0.85 for Tier 1)
+    \item Required NAICS code agreement at 4-digit level when available
+\end{itemize}
+
+\subsection{Match Quality Validation}
+
+\subsubsection{Human Review Sample}
+
+We manually review a stratified random sample of 100 matches from each tier:
+
+\begin{itemize}
+    \item \textbf{High-confidence matches} (similarity $> 0.95$): Verify 25 matches
+    \item \textbf{Medium-confidence matches} (similarity 0.85--0.95): Verify 50 matches
+    \item \textbf{Borderline matches} (similarity 0.80--0.85): Verify 25 matches
+\end{itemize}
+
+Reviewers classify each match as:
+\begin{itemize}
+    \item \textbf{Correct:} Names refer to the same legal entity
+    \item \textbf{Incorrect:} Names refer to different entities
+    \item \textbf{Ambiguous:} Cannot determine without additional information
+\end{itemize}
+
+\subsubsection{Expected Match Rates}
+
+Based on similar entity resolution exercises, we expect:
+
+\begin{itemize}
+    \item \textbf{Tier 1 (brands):} 80\%+ of Advan brands matched to PAW companies
+    \item \textbf{Tier 2 (singletons):} 20--40\% of singletons matched, with high precision but lower recall
+\end{itemize}
+
+\subsection{Output Schema}
+
+\subsubsection{Brand Crosswalk}
+
+For Tier 1 matches, we output \texttt{brand\_crosswalk.parquet}:
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lll}
+\toprule
+Column & Type & Description \\
+\midrule
+\texttt{safegraph\_brand\_id} & string & Advan brand identifier \\
+\texttt{brand\_name} & string & Advan brand name \\
+\texttt{rcid} & string & PAW company identifier \\
+\texttt{company\_name} & string & PAW company name \\
+\texttt{match\_type} & string & ``exact\_ticker'' or ``fuzzy\_embedding'' \\
+\texttt{cosine\_similarity} & float & Embedding similarity score \\
+\texttt{jaro\_winkler} & float & String distance score \\
+\texttt{review\_flag} & boolean & Flagged for manual review \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Singleton Crosswalk}
+
+For Tier 2 matches, we output \texttt{singleton\_crosswalk/\{msa\}.parquet}:
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lll}
+\toprule
+Column & Type & Description \\
+\midrule
+\texttt{placekey} & string & Advan POI identifier \\
+\texttt{location\_name} & string & Advan location name \\
+\texttt{rcid} & string & PAW company identifier \\
+\texttt{company\_name} & string & PAW company name \\
+\texttt{msa} & string & MSA name \\
+\texttt{cosine\_similarity} & float & Embedding similarity score \\
+\texttt{naics\_match} & boolean & NAICS codes agree at 4-digit level \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Computational Costs}
+
+\begin{table}[htbp]
+\centering
+\caption{Embedding Generation Costs}
+\begin{tabular}{lrrr}
+\toprule
+Component & Records & Tokens (est.) & Cost \\
+\midrule
+Advan brand names & 14,800 & 45,000 & \$0.01 \\
+PAW company names (unique) & 3,000,000 & 10,000,000 & \$0.20 \\
+\textbf{Total} & & & \textbf{\$0.21} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Limitations}
+
+\begin{enumerate}
+    \item \textbf{Name variations:} Despite embedding-based matching, some legitimate matches may be missed due to substantial name differences (e.g., ``Alphabet Inc'' vs. ``Google'')
+    \item \textbf{Subsidiary relationships:} A company may operate multiple brands (e.g., Yum! Brands operates Taco Bell, KFC, Pizza Hut). Our matching does not capture parent-subsidiary relationships
+    \item \textbf{Private companies:} Companies without ticker symbols rely entirely on name matching, which may have lower precision
+    \item \textbf{Geographic blocking errors:} Companies with headquarters in one MSA may have employees recorded in another MSA, potentially causing false negatives in Tier 2 matching
+    \item \textbf{Temporal misalignment:} PAW employment records span multiple years; company names may change over time due to mergers, rebranding, or acquisitions
+\end{enumerate}
+
+\subsection{Replication}
+
+To replicate this entity resolution procedure:
+
+\begin{enumerate}
+    \item Obtain access to PAW employment microdata (restricted access required)
+    \item Obtain Advan POI data (commercial license required from Advan/Dewey)
+    \item Generate embeddings using OpenAI API with model \texttt{text-embedding-3-small}
+    \item Compute cosine similarities using scikit-learn or equivalent
+    \item Apply thresholds (0.85 for Tier 1, 0.90 for Tier 2)
+    \item Review sample matches for quality assurance
+\end{enumerate}
+
+Scripts are available at: \texttt{[GitHub repository URL]}

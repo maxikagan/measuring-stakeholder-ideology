@@ -4,6 +4,7 @@
 - Don't run jobs on the login node. Create a bash job with SLURM.
 - Data fidelity is paramount - be transparent with everything, no unnecessary shortcuts.
 - This is academic research - document all steps clearly.
+- **Multi-stage analytics jobs**: Create validation checks at each step to ensure output is reasonable and as expected (e.g., row counts, value ranges, sample records, known-answer tests).
 
 ## Code Review Requirement (MANDATORY)
 **Before running ANY new or modified code**, use the Code Reviewer agent to critically review it.
@@ -82,9 +83,9 @@ Fall 2026 job market paper for SMJ/Organization Science/Management Science/ASQ
 - API budget for FuzzyLink: $500-2000
 
 ### File Structure
-- **Home** (`/global/home/users/maxkagan/project_oakland/`): scripts, references, small files
-- **Scratch** (`/global/scratch/users/maxkagan/project_oakland/`): large data only
-- **GitHub**: https://github.com/maxikagan/project_oakland
+- **Home** (`/global/home/users/maxkagan/measuring_stakeholder_ideology/`): scripts, references, small files
+- **Scratch** (`/global/scratch/users/maxkagan/measuring_stakeholder_ideology/`): large data only
+- **GitHub**: https://github.com/maxikagan/measuring-stakeholder-ideology
 
 ### Research Agenda
 See `research_agenda_draft.md` for full details including:
