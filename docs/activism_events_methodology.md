@@ -7,7 +7,24 @@ This document outlines a methodology for creating a comprehensive dataset of cor
 1. **Mkrtchyan, Sandvik, & Zhu (2024)** - "CEO Activism and Firm Value" (Management Science)
 2. **Conway & Boxell (2024)** - "Consuming Values" (SSRN)
 
-The goal is to identify when firms or their CEOs take public stances on social/political issues, code these events, and measure their salience.
+**Primary research question:** When firms take political stances, is it driven more by employee composition or customer composition?
+
+**Use case:** Activism events as a **dependent variable** - predicting which firms speak out based on employee and customer ideology measures.
+
+---
+
+## Scope Decisions
+
+| Dimension | Decision | Rationale |
+|-----------|----------|-----------|
+| **Firm universe** | 1000+ brands from Advan data | Ensures linkage to foot traffic outcomes |
+| **Time period** | 2019-2025 | Extends existing datasets, captures recent events |
+| **Attribution level** | Firm-level | CEO-specific attribution not required for DV use case |
+| **Event detail** | Topic + ideology coding | Full Mkrtchyan coding (vividness, action level) not needed |
+| **Ideology coverage** | Both liberal AND conservative | Explicitly capture right-leaning stances |
+| **Explicit neutrality** | Yes - as separate category | Firms explicitly stating "we won't take a stance" |
+| **Timeline** | Flexible (quality over speed) | ~4-5 weeks estimated |
+| **Budget** | $200-500 | GDELT is free; LLM costs moderate |
 
 ---
 
@@ -23,367 +40,404 @@ The goal is to identify when firms or their CEOs take public stances on social/p
 | **Filtering** | RA manual coding (1-5 scale) | Manual verification + awareness measurement |
 | **Coding** | Ideology, action, vividness, relatedness | Topic, ideology, consumer awareness |
 
-### Combined Approach: Best of Both Worlds
+### What We Take From Each
 
 **From Mkrtchyan et al.:**
-- Comprehensive keyword-based scraping
-- Detailed event coding (ideology, action level, vividness)
-- CEO-level attribution
+- Comprehensive keyword-based identification
+- Ideology coding approach
 
 **From Conway & Boxell:**
-- Multi-method triangulation (reduces false negatives)
-- Salience filtering via Google Trends + news spikes
-- GPT-4 assisted event identification
-- Consumer awareness measurement
+- Multi-method triangulation (Google Trends + news + LLM)
+- Salience measurement via search/news spikes
+- LLM-assisted event generation
 
 ---
 
-## Step 1: Merged Keyword List
+## Step 1: Firm List
 
-### Mkrtchyan et al. Keywords (50 keywords)
+**Source:** Extract unique brand names from Advan monthly patterns data
+
+**Process:**
+1. Pull distinct `brands` or `location_name` values from Advan
+2. Standardize names (remove Inc., LLC, etc.)
+3. Filter to brands with sufficient foot traffic volume
+4. Target: 1000+ brands
+
+**Why Advan-based:** Ensures every firm in the activism dataset can be linked to customer ideology (via visitor_home_cbgs) and foot traffic outcomes.
+
+---
+
+## Step 2: Keyword List
+
+### Liberal-Leaning Topics
 
 | Category | Keywords |
 |----------|----------|
-| **Diversity** | discrimination, ethnicity, glass ceiling, harassment, inclusion, racial, religion, gay marriage, homosexual, lesbian, LGBT, same-sex |
-| **Environment** | clean air, clean water, environment, pollution, renewable, carbon tax, climate change, global warming, land conservation, Paris accord |
-| **Politics** | debt ceiling, Democrat, fiscal cliff, government shutdown, Republican, tariffs, taxes, Brexit, Clinton, Obama, travel ban, Trump |
-| **Other** | abortion, dreamers, equal pay, gun, healthcare, human rights, immigration, indigenous people, Nazi, Obamacare, pay gap, poverty, prison, refugee, violence, war, white supremacists, #keepfamiliestogether |
+| **LGBT/Trans** | gay, gay marriage, homosexual, lesbian, LGBT, same-sex, transgender, trans rights, gender-affirming, queer, lgbtq, lgbtq+, lgbtqia, bathroom bill, drag, pronoun |
+| **Racial Justice** | BLM, Black Lives Matter, George Floyd, Juneteenth, systemic racism, police, defund, racial, discrimination, inclusion |
+| **Environment** | climate change, global warming, carbon tax, Paris accord, renewable, clean energy, environment, pollution, ESG |
+| **Immigration (pro)** | dreamers, daca, refugee, immigration rights, #keepfamiliestogether |
+| **Reproductive (pro-choice)** | reproductive rights, abortion access, pro-choice, Roe |
+| **DEI** | DEI, diversity equity inclusion, diversity initiative |
 
-### Conway & Boxell Keywords
+### Conservative-Leaning Topics
 
-| Source | Keywords |
-|--------|----------|
-| **Google Trends** | gay, transgender, immigration, political contributions, political, voting, controversy, buycott, boycott, gun control, abortion |
-| **ProQuest (additional)** | racial, social issue, lesbian, queer, lgbtq, lgbtq+, lgbtqia, daca, guns, second amendment, reproductive rights |
+| Category | Keywords |
+|----------|----------|
+| **Trump/MAGA** | Trump, MAGA, Trump endorsement, Mar-a-Lago |
+| **Anti-DEI** | anti-woke, woke, anti-DEI, DEI rollback, meritocracy |
+| **Anti-ESG** | anti-ESG, ESG backlash |
+| **Immigration (restrictionist)** | border security, illegal immigration, travel ban |
+| **Reproductive (pro-life)** | pro-life, abortion ban |
+| **Trade/Tariffs** | tariffs, trade war, protectionism, Buy American |
+| **Second Amendment** | gun rights, second amendment, NRA |
 
-### New Keywords for 2019-2025
+### Neutral/Contested Topics
 
-| Category | New Keywords |
-|----------|-------------|
-| **Racial Justice (2020)** | BLM, Black Lives Matter, George Floyd, Juneteenth, systemic racism, police, defund |
-| **COVID (2020-2022)** | vaccine, vaccine mandate, mask, mask mandate, pandemic, lockdown, remote work |
-| **Democracy (2021+)** | Capitol, insurrection, January 6, election integrity, election fraud, Stop the Steal |
-| **Abortion (2022+)** | Roe, Dobbs, reproductive rights, abortion access, abortion ban, pro-choice, pro-life |
-| **Trans Rights (2022+)** | transgender, trans rights, gender-affirming, bathroom bill, drag, pronoun |
-| **DEI/Anti-DEI (2023+)** | DEI, diversity equity inclusion, anti-woke, woke, ESG, anti-ESG |
-| **Geopolitics** | Ukraine, Russia, Israel, Gaza, Hamas, ceasefire |
-| **AI (2023+)** | AI ethics, artificial intelligence, responsible AI, AI safety |
-| **Specific events** | Bud Light, Dylan Mulvaney, Target Pride, Disney, Ron DeSantis |
+| Category | Keywords |
+|----------|----------|
+| **Israel/Gaza** | Israel, Gaza, Hamas, ceasefire, antisemitism |
+| **COVID** | vaccine, vaccine mandate, mask, mask mandate, pandemic, lockdown, remote work |
+| **AI Ethics** | AI ethics, artificial intelligence, responsible AI, AI safety |
+| **Explicit Neutrality** | not taking a stance, staying neutral, won't comment, staying out of, no political position |
 
----
+### From Original Papers (Retained)
 
-## Step 2: Multi-Source Event Identification Pipeline
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        EVENT IDENTIFICATION SOURCES                          │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-     ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-     │   METHOD 1   │    │   METHOD 2   │    │   METHOD 3   │    │   METHOD 4   │
-     │Google Trends │    │News Scraping │    │Twitter/X     │    │  LLM Query   │
-     │  (Conway)    │    │(Both papers) │    │(Mkrtchyan)   │    │  (Conway)    │
-     └──────┬───────┘    └──────┬───────┘    └──────┬───────┘    └──────┬───────┘
-            │                   │                   │                   │
-            ▼                   ▼                   ▼                   ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         CANDIDATE EVENT POOL                                 │
-│                    (Union of all methods - high recall)                      │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         LLM-ASSISTED FILTERING                               │
-│           "Is this actually a corporate social/political stance?"            │
-│                        (Replaces RA manual coding)                           │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           LLM-ASSISTED CODING                                │
-│  • Ideology (liberal/neutral/conservative)                                   │
-│  • Action level (statement only / low-moderate / high cashflow)              │
-│  • Vividness (1-3)                                                           │
-│  • Business relatedness (1-3)                                                │
-│  • Topic category                                                            │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         SALIENCE MEASUREMENT                                 │
-│  • Google Trends spike magnitude                                             │
-│  • News article count                                                        │
-│  • (Optional) BrandIndex if available                                        │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                          FINAL EVENT DATASET                                 │
-│            Firm × Date × Topic × Ideology × Salience × Coding                │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+| Category | Keywords |
+|----------|----------|
+| **Politics (general)** | Democrat, Republican, political, voting, controversy, boycott, buycott |
+| **Other Social** | equal pay, pay gap, healthcare, human rights, indigenous people, poverty, gun control |
 
 ---
 
-## Step 3: Detailed Implementation
+## Step 3: Event Identification Pipeline
 
-### Method 1: Google Trends Identification (Conway approach)
-
-**Input:** Firm list × Keyword list × Date range (2019-2025)
-
-**Procedure:**
-1. Get firm list (S&P 500 + top brands from Advan data)
-2. Query `pytrends` for each firm × keyword combination
-3. Calculate spike index (28-day forward vs. backward moving average)
-4. Flag firm-dates with largest spikes as candidates
-
-**Technical notes:**
-- `pytrends` has rate limits; need to throttle queries
-- Monthly pulls first, then daily for candidate months
-- Normalize using rolling window z-scores (6, 12, 24 months)
-
-```python
-# Pseudocode
-from pytrends.request import TrendReq
-
-def get_trends_candidates(firms, keywords, start_date, end_date):
-    pytrends = TrendReq()
-    candidates = []
-
-    for firm in firms:
-        for keyword in keywords:
-            query = f"{firm} {keyword}"
-            pytrends.build_payload([query], timeframe=f'{start_date} {end_date}')
-            data = pytrends.interest_over_time()
-
-            # Calculate spike index
-            data['forward_ma'] = data[query].rolling(28).mean().shift(-28)
-            data['backward_ma'] = data[query].rolling(28).mean()
-            data['spike'] = data['forward_ma'] - data['backward_ma']
-
-            # Flag large spikes
-            threshold = data['spike'].quantile(0.99)
-            spikes = data[data['spike'] > threshold]
-            candidates.extend([(firm, date, keyword) for date in spikes.index])
-
-    return candidates
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ 1. GET FIRM LIST FROM ADVAN                                     │
+│    - Extract unique brand names from Advan data                 │
+│    - Clean/standardize names                                    │
+│    - ~1000+ firms                                               │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 2. LLM-GENERATED CANDIDATE EVENTS                               │
+│    - Query Claude/GPT-4 for known activism events               │
+│    - Cover all topics (liberal + conservative + neutral)        │
+│    - Explicitly ask for conservative-leaning events             │
+│    - ~200-500 high-confidence events                            │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 3. GDELT NEWS SCRAPING (BigQuery)                               │
+│    - Query firm names + keywords                                │
+│    - Identify news spikes (28-day forward vs. backward MA)      │
+│    - Additional candidates beyond LLM recall                    │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 4. GOOGLE TRENDS VALIDATION                                     │
+│    - Confirm candidate events show search interest spikes       │
+│    - Measure salience                                           │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 5. LLM CODING                                                   │
+│    - Is this activism? (binary filter)                          │
+│    - Topic category                                             │
+│    - Ideology (Liberal / Neutral / Conservative)                │
+│    - Is this explicit neutrality? (firm saying "no stance")     │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 6. MANUAL SPOT-CHECK                                            │
+│    - Review ~100 events for accuracy                            │
+│    - Fix any systematic errors                                  │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 7. MERGE WITH EMPLOYEE/CUSTOMER IDEOLOGY                        │
+│    - Join to PAW data (employee ideology by firm)               │
+│    - Join to Advan + CBG voting (customer ideology by brand)    │
+│    - Ready for analysis                                         │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### Method 2: News Scraping (Both papers)
+## Step 4: Method Details
 
-**Option A: ProQuest/LexisNexis (if academic access)**
-- Query: Firm as subject + social keywords in text
-- Count articles per firm-day
-- Flag dates with largest spikes
+### Method A: LLM-Generated Candidate Events
 
-**Option B: Google News (Mkrtchyan approach)**
-- Query: CEO name + firm name + keyword
-- Use `googlenews` or `newspaper3k` Python packages
-- Extract headlines, dates, URLs
-
-**Option C: NewsAPI or GDELT (alternative)**
-- NewsAPI: 500 requests/day free tier, $449/mo for unlimited
-- GDELT: Free, comprehensive, but requires BigQuery
-
-**Query templates (from Mkrtchyan):**
-```
-<"CEO first name" AND "CEO last name" AND keyword>
-<"CEO first name" AND "CEO last name" AND "firm name" AND keyword>
-<"firm name" AND CEO AND keyword>
-<"firm name" AND chief AND keyword>
-```
-
----
-
-### Method 3: Twitter/X Extraction
-
-**Challenge:** Musk restricted free API access in 2023
-
-**Options:**
-
-| Option | Cost | Coverage | Feasibility |
-|--------|------|----------|-------------|
-| X API Basic | $100/mo | 10K tweets/mo | Low volume |
-| X API Pro | $5,000/mo | 1M tweets/mo | Expensive |
-| Internet Archive | Free | Historical only (pre-2023) | Partial |
-| Scrape news about tweets | Free | Indirect | Reasonable |
-| Skip Twitter entirely | Free | - | Fallback |
-
-**Recommendation:** Focus on news coverage of CEO tweets rather than direct Twitter scraping. Most newsworthy tweets get media coverage anyway.
-
----
-
-### Method 4: LLM-Assisted Event Generation (Conway approach, extended)
-
-**Prompts for 2019-2025:**
+**Prompts:**
 
 ```
-PROMPT 1 (Initial):
-"List 50 of the most notable and widely covered events in which
-individual companies took partisan stances on controversial
-social/political issues in the U.S. between January 2019 and
-December 2025, inclusive.
+PROMPT 1 (Liberal stances):
+"List 50 of the most notable events in which U.S. companies took
+LIBERAL-LEANING stances on social/political issues between
+January 2019 and December 2025.
 
-Include events related to: BLM/racial justice, COVID policies,
-January 6, Dobbs/abortion, trans rights, DEI initiatives,
-ESG controversies, and any other partisan corporate stances.
+Include: LGBT/trans rights, BLM/racial justice, climate/environment,
+pro-immigration, reproductive rights, DEI initiatives.
 
 For each event, provide:
 - company: company name
 - date: start date (MM/DD/YY)
-- ideology: liberal, conservative, or neutral
 - topic: main topic category
 - description: brief (2-6 word) description
 
-Order by notability (descending). Output as CSV."
+Order by notability. Output as CSV."
 
-PROMPT 2 (Extension):
-"Extend this list with 50 more events. Avoid duplicates.
-Focus on events that received significant media coverage
-or consumer backlash."
+PROMPT 2 (Conservative stances):
+"List 50 of the most notable events in which U.S. companies took
+CONSERVATIVE-LEANING stances on social/political issues between
+January 2019 and December 2025.
 
-PROMPT 3 (Specific topics):
-"List 30 notable corporate stances specifically related to
-[TOPIC: e.g., "trans rights and bathroom bills"] between
-2019-2025. Same format as above."
+Include: Trump endorsements/support, anti-DEI/anti-woke rollbacks,
+anti-ESG statements, restrictionist immigration stances, pro-life
+positions, tariff/protectionism support, Second Amendment support.
+
+For each event, provide:
+- company: company name
+- date: start date (MM/DD/YY)
+- topic: main topic category
+- description: brief (2-6 word) description
+
+Order by notability. Output as CSV."
+
+PROMPT 3 (Explicit neutrality):
+"List 30 notable instances where U.S. companies EXPLICITLY STATED
+they would not take a political stance or were 'staying neutral'
+on controversial issues between 2019-2025.
+
+This must be an EXPLICIT statement (e.g., 'we don't take political
+positions', 'we're staying out of this debate'), NOT simply the
+absence of a statement.
+
+For each, provide:
+- company: company name
+- date: date of neutrality statement (MM/DD/YY)
+- context: what issue they declined to take a stance on
+- description: brief description
+
+Output as CSV."
+
+PROMPT 4 (Contested topics):
+"List 30 notable corporate stances on Israel/Gaza, COVID policies,
+or AI ethics between 2019-2025. Include stances from both political
+perspectives. Same format as above."
 ```
 
-**Run this for each major topic area to ensure coverage.**
+**Run multiple prompts to ensure coverage across ideological spectrum.**
 
 ---
 
-## Step 4: LLM-Assisted Coding (Replacing RAs)
+### Method B: GDELT + BigQuery
 
-### Coding Prompt Template
+**Why GDELT:** Free, comprehensive news archive accessible via BigQuery.
+
+**Query approach:**
+
+```sql
+-- Example GDELT query for firm + keyword mentions
+SELECT
+  DATE(TIMESTAMP_SECONDS(DATEADDED)) as date,
+  SourceCommonName as source,
+  DocumentIdentifier as url,
+  V2Themes,
+  V2Tone
+FROM `gdelt-bq.gdeltv2.gkg_partitioned`
+WHERE
+  DATE(_PARTITIONTIME) BETWEEN '2019-01-01' AND '2025-12-31'
+  AND (
+    REGEXP_CONTAINS(LOWER(V2Themes), r'company_name')
+    AND REGEXP_CONTAINS(LOWER(V2Themes), r'keyword')
+  )
+```
+
+**Process:**
+1. Query GDELT for each firm × keyword combination
+2. Count articles per firm-day
+3. Calculate spike index (28-day forward vs. backward moving average)
+4. Flag firm-dates with largest spikes as candidates
+
+---
+
+### Method C: Google Trends Validation
+
+**Purpose:** Confirm candidate events and measure salience
+
+```python
+from pytrends.request import TrendReq
+
+def validate_event_salience(firm, date, keyword):
+    pytrends = TrendReq()
+
+    # Get daily data around event date
+    start = date - timedelta(days=135)
+    end = date + timedelta(days=135)
+
+    pytrends.build_payload(
+        [f"{firm} {keyword}"],
+        timeframe=f'{start.strftime("%Y-%m-%d")} {end.strftime("%Y-%m-%d")}'
+    )
+    data = pytrends.interest_over_time()
+
+    # Calculate spike magnitude
+    pre_event = data.loc[:date-timedelta(days=1)].mean()
+    post_event = data.loc[date:date+timedelta(days=28)].max()
+
+    return {
+        'salience': post_event - pre_event,
+        'peak_value': post_event
+    }
+```
+
+---
+
+## Step 5: LLM Coding
+
+### Simplified Coding Schema
+
+For DV use case, we only need:
+
+| Field | Values | Description |
+|-------|--------|-------------|
+| `is_activism` | TRUE/FALSE | Is this actually a corporate stance? |
+| `topic` | See list below | Primary topic category |
+| `ideology` | L / N / C | Liberal, Neutral, or Conservative |
+| `is_explicit_neutrality` | TRUE/FALSE | Firm explicitly saying "we won't take a stance" |
+
+**Topic categories:**
+- `lgbt` - LGBT/trans rights
+- `racial_justice` - BLM, racial discrimination
+- `environment` - Climate, ESG
+- `immigration` - Pro or anti
+- `abortion` - Reproductive rights
+- `dei` - DEI initiatives or anti-DEI
+- `trump` - Trump endorsements/opposition
+- `tariffs` - Trade policy
+- `guns` - Gun control or rights
+- `israel_gaza` - Middle East
+- `covid` - Pandemic policies
+- `ai` - AI ethics
+- `other` - Other topics
+
+### Coding Prompt
 
 ```
 You are coding corporate activism events for academic research.
 
-For the following news article/tweet about a corporate stance,
-provide ratings on these dimensions:
+For the following news headline/article about a company, determine:
 
-1. IS_ACTIVISM (1-5): Is this actually a corporate political/social
-   stance, or a false positive?
-   1 = Definitely not activism
-   5 = Definitely activism
+1. IS_ACTIVISM: Is this an actual corporate political/social stance?
+   - TRUE if the company or its leadership took a public position
+   - FALSE if this is a false positive (e.g., shooting at store,
+     executive scandal unrelated to company stance)
 
-2. IDEOLOGY (L/N/C): Is the stance liberal-leaning, neutral, or
-   conservative-leaning?
+2. TOPIC: What is the primary topic? Choose from:
+   lgbt, racial_justice, environment, immigration, abortion, dei,
+   trump, tariffs, guns, israel_gaza, covid, ai, other
 
-3. ACTION_LEVEL (1-3):
-   1 = Statement only (zero cashflow implications)
-   2 = Action with low/moderate cashflow implications
-   3 = Action with high cashflow implications
+3. IDEOLOGY: What is the ideological direction?
+   - L = Liberal-leaning
+   - N = Neutral or unclear
+   - C = Conservative-leaning
 
-4. VIVIDNESS (1-3): How counter-normative or attention-grabbing?
-   1 = Not vivid (routine statement)
-   2 = Somewhat vivid
-   3 = Very vivid (highly controversial)
-
-5. BUSINESS_RELATED (1-3):
-   1 = Obviously related to firm's business
-   2 = Unclear
-   3 = Obviously unrelated to firm's business
-
-6. TOPIC: Categorize into one of: diversity, environment, politics,
-   abortion, LGBT, immigration, guns, COVID, racial_justice, other
+4. IS_EXPLICIT_NEUTRALITY: Is this a company EXPLICITLY stating
+   they will not take a political position?
+   - TRUE only if company explicitly says "we're not taking a stance"
+     or similar
+   - FALSE for actual stances OR for companies that simply didn't speak
 
 ---
-ARTICLE/TWEET:
+HEADLINE/ARTICLE:
 {content}
 
-FIRM: {firm_name}
+COMPANY: {company_name}
 DATE: {date}
 
-Respond in JSON format:
+Respond in JSON:
 {
-  "is_activism": <1-5>,
-  "ideology": "<L/N/C>",
-  "action_level": <1-3>,
-  "vividness": <1-3>,
-  "business_related": <1-3>,
+  "is_activism": true/false,
   "topic": "<category>",
+  "ideology": "L"/"N"/"C",
+  "is_explicit_neutrality": true/false,
   "reasoning": "<brief explanation>"
 }
 ```
 
-### Validation Protocol
-
-1. Take 200 randomly sampled events from Mkrtchyan et al. original data
-2. Run LLM coding on same events
-3. Calculate agreement rates:
-   - Is_activism: Should be >85% agreement
-   - Ideology: Should be >90% agreement
-   - Other dimensions: >75% agreement
-4. If validated, proceed with new data
-
 ---
 
-## Step 5: Salience Measurement
-
-Following Conway & Boxell, measure event salience via:
-
-| Measure | Source | Calculation |
-|---------|--------|-------------|
-| Google Trends spike | pytrends | Max daily index in 28-day post window |
-| News volume | NewsAPI/ProQuest | Count of articles in 28-day post window |
-| Search interest | Google Trends | Total search volume in event month |
-
-This allows weighting events by how much consumers actually noticed them.
-
----
-
-## Implementation Timeline & Costs
-
-| Phase | Tasks | Time | Cost |
-|-------|-------|------|------|
-| **1. Setup** | Firm list, keyword list, API access | 1 week | $100-500 (APIs) |
-| **2. Google Trends** | Query all firm × keyword combinations | 2 weeks | Free (rate-limited) |
-| **3. News scraping** | Google News or NewsAPI queries | 2 weeks | $0-500 |
-| **4. LLM generation** | GPT-4/Claude prompts for candidate events | 1 week | $50-100 |
-| **5. Candidate merge** | Combine all sources, deduplicate | 1 week | Free |
-| **6. LLM coding** | Code all candidates | 1-2 weeks | $200-500 |
-| **7. Validation** | Compare to original Mkrtchyan data | 1 week | $50 |
-| **8. Salience scoring** | Measure awareness/coverage | 1 week | Free |
-
-**Total: 8-12 weeks, $400-1,700**
-
----
-
-## Expected Output Schema
+## Step 6: Output Schema
 
 | Field | Description |
 |-------|-------------|
-| `firm_name` | Company name |
-| `firm_ticker` | Stock ticker (if public) |
-| `ceo_name` | CEO at time of event |
+| `brand_name` | Standardized brand name (from Advan) |
 | `event_date` | Date of stance |
-| `topic` | Category (diversity, environment, etc.) |
+| `topic` | Topic category |
 | `ideology` | L / N / C |
-| `action_level` | 1-3 |
-| `vividness` | 1-3 |
-| `business_related` | 1-3 |
+| `is_explicit_neutrality` | TRUE if firm explicitly declined to take stance |
 | `salience_google` | Google Trends spike magnitude |
-| `salience_news` | News article count |
-| `source_url` | Link to source article/tweet |
+| `salience_news` | News article count (from GDELT) |
+| `source_url` | Link to source article |
 | `description` | Brief description of stance |
 
-**Expected event count:** 500-2,000 events for 2019-2025 (depending on filtering strictness)
+**Expected output:** 500-2,000 events for 2019-2025
+
+---
+
+## Step 7: Validation
+
+### Manual Spot-Check Protocol
+
+1. Randomly sample 100 coded events
+2. Review each for accuracy on:
+   - Is this actually activism? (not false positive)
+   - Is the topic correct?
+   - Is the ideology coding correct?
+3. Calculate accuracy rates
+4. If <90% accuracy, refine LLM prompts and re-code
+5. Document any systematic errors
+
+---
+
+## Timeline & Costs
+
+| Phase | Tasks | Time | Cost |
+|-------|-------|------|------|
+| Firm list extraction | Pull brands from Advan | 1 day | $0 |
+| LLM candidate generation | Run prompts for all topics | 2-3 days | $20-50 |
+| GDELT BigQuery setup | Configure queries | 1-2 days | $0 |
+| GDELT scraping | Run queries for all firms | 1 week | $0 (free tier) |
+| Google Trends validation | Validate candidates | 1 week | $0 |
+| LLM coding | Code all candidates | 1 week | $50-100 |
+| Manual spot-check | Review ~100 events | 2-3 days | $0 |
+| Merge with ideology | Join to PAW + Advan | 1 day | $0 |
+
+**Total: ~4-5 weeks, ~$100-200**
 
 ---
 
 ## Integration with Project Oakland
 
-Once the activism event dataset is created, merge with:
+Once complete, merge activism dataset with:
 
-1. **Employee ideology** (Politics at Work) → Does employee composition predict which stances firms take?
-2. **Customer ideology** (Advan + CBG voting) → Does customer composition predict stances?
-3. **Firm outcomes** (foot traffic, spending, stock returns) → What happens after stances?
+1. **Employee ideology** (Politics at Work)
+   - Aggregate to firm level
+   - Measure: mean/median employee partisan lean
 
-**Research question:**
-> When firms take political stances, is it driven more by employee composition or customer composition? And whose reaction matters more for firm outcomes?
+2. **Customer ideology** (Advan + CBG voting)
+   - Weight visitor_home_cbgs by visit share
+   - Merge with CBG-level 2020 election results
+   - Measure: visitor-weighted partisan lean
+
+**Analysis:**
+```
+Activism_i = β₁(Employee_Ideology_i) + β₂(Customer_Ideology_i) + Controls + ε
+```
+
+Test: Is β₁ > β₂ (employees matter more) or β₂ > β₁ (customers matter more)?
 
 ---
 
@@ -391,36 +445,39 @@ Once the activism event dataset is created, merge with:
 
 - Mkrtchyan, A., Sandvik, J., & Zhu, V. Z. (2024). CEO Activism and Firm Value. *Management Science*, 70(10), 6519-6549.
 - Conway, J., & Boxell, L. (2024). Consuming Values. *SSRN Working Paper*.
-- Klostermann, J., et al. (2021). [Reference for corporate stance topics]
 
 ---
 
-## Appendix: Full Keyword List
+## Appendix: Full Keyword List (Consolidated)
 
-### Combined Keywords (Deduplicated)
+### All Keywords by Category
 
-**Diversity:** discrimination, ethnicity, glass ceiling, harassment, inclusion, racial, religion, gay marriage, homosexual, lesbian, LGBT, same-sex, gay, transgender, queer, lgbtq, lgbtq+, lgbtqia, trans rights, gender-affirming, bathroom bill, drag, pronoun
+**LGBT/Trans:** gay, gay marriage, homosexual, lesbian, LGBT, same-sex, transgender, trans rights, gender-affirming, queer, lgbtq, lgbtq+, lgbtqia, bathroom bill, drag, pronoun
 
-**Environment:** clean air, clean water, environment, pollution, renewable, carbon tax, climate change, global warming, land conservation, Paris accord
+**Racial Justice:** BLM, Black Lives Matter, George Floyd, Juneteenth, systemic racism, police, defund, racial, discrimination, inclusion, Nazi, white supremacists
 
-**Politics:** debt ceiling, Democrat, fiscal cliff, government shutdown, Republican, tariffs, taxes, Brexit, Clinton, Obama, travel ban, Trump, political contributions, political, voting, Capitol, insurrection, January 6, election integrity, election fraud, Stop the Steal, Biden
+**Environment:** climate change, global warming, carbon tax, Paris accord, renewable, clean energy, environment, pollution, clean air, clean water, land conservation
 
-**Abortion/Reproductive:** abortion, reproductive rights, Roe, Dobbs, abortion access, abortion ban, pro-choice, pro-life
+**Immigration:** immigration, dreamers, daca, refugee, #keepfamiliestogether, border security, illegal immigration, travel ban
 
-**Immigration:** immigration, dreamers, daca, refugee, #keepfamiliestogether
+**Abortion:** abortion, reproductive rights, Roe, Dobbs, abortion access, abortion ban, pro-choice, pro-life
 
-**Guns:** gun, gun control, guns, second amendment
+**DEI/Anti-DEI:** DEI, diversity equity inclusion, diversity initiative, anti-woke, woke, anti-DEI, DEI rollback, meritocracy
 
-**Racial Justice:** BLM, Black Lives Matter, George Floyd, Juneteenth, systemic racism, police, defund, Nazi, white supremacists
+**ESG/Anti-ESG:** ESG, anti-ESG, ESG backlash, sustainable investing
+
+**Trump/Politics:** Trump, MAGA, Trump endorsement, Mar-a-Lago, Democrat, Republican, Clinton, Obama, Biden, Capitol, insurrection, January 6, election integrity, election fraud
+
+**Trade/Tariffs:** tariffs, trade war, protectionism, Buy American
+
+**Guns:** gun, gun control, guns, second amendment, gun rights, NRA
+
+**Israel/Gaza:** Israel, Gaza, Hamas, ceasefire, antisemitism
 
 **COVID:** vaccine, vaccine mandate, mask, mask mandate, pandemic, lockdown, remote work
 
-**Other Social:** equal pay, healthcare, human rights, indigenous people, Obamacare, pay gap, poverty, prison, violence, war, controversy, buycott, boycott, social issue
+**AI Ethics:** AI ethics, artificial intelligence, responsible AI, AI safety
 
-**DEI/ESG:** DEI, diversity equity inclusion, anti-woke, woke, ESG, anti-ESG
+**Explicit Neutrality:** not taking a stance, staying neutral, won't comment, staying out of, no political position, apolitical
 
-**Geopolitics:** Ukraine, Russia, Israel, Gaza, Hamas, ceasefire
-
-**AI:** AI ethics, artificial intelligence, responsible AI, AI safety
-
-**Specific Events/Brands:** Bud Light, Dylan Mulvaney, Target Pride, Disney, Ron DeSantis
+**Other:** equal pay, pay gap, healthcare, human rights, indigenous people, poverty, controversy, boycott, buycott, social issue
