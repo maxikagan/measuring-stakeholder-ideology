@@ -25,10 +25,76 @@ Combine two unique large-scale datasets to study the relationship between **empl
 
 ### Primary Comparison: Twitter-Based Consumer Ideology
 **Schoenmueller, Netzer, & Stahl (2023)** - "Polarized America: From Political Polarization to Preference Polarization" (*Marketing Science*)
-- Uses Twitter followership to measure brand political lean
-- **Public API available**: http://www.social-listening.org
-- Captures online engagement vs. our physical foot traffic
-- **Framing**: Validation if measures converge; complementary constructs if they diverge
+
+#### Their Core Contribution
+Demonstrates that political polarization extends to consumer brand preferences, using triangulation across three data sources:
+
+| Data Source | What It Captures | Political ID Method |
+|-------------|------------------|---------------------|
+| Twitter (n=176K users, 307 brands) | Online brand following | DEM/GOP account follows |
+| YouGov BrandIndex (1,308 brands) | Stated preferences/intentions | Self-reported party ID |
+| Nielsen Scanner (27K brands, 27K stores) | Actual purchases | County voting results |
+
+#### Their Key Measure: Relative Lift Preference Partisanship (RLPP)
+```
+RLPP_DEM_b = LPP_DEM_b / (LPP_GOP_b + LPP_DEM_b)
+
+where LPP_bp = P(brand ∩ party) / [P(brand) × P(party)]
+```
+
+#### Main Empirical Analyses
+
+| Analysis | Design | Key Finding |
+|----------|--------|-------------|
+| **Twitter basket polarization** | User FE + Post-Election × DEM | Democrats followed more Dem brands post-2016 (β=0.036***) |
+| **YouGov stated preferences** | Panelist FE + Post-Election × DEM | Same pattern for consideration, buy intent, ownership, WOM |
+| **Nielsen purchases** | Store FE + Post-Election × DEM_county | Dem brands sold more in Dem counties post-2016 |
+| **Demand vs. Supply** | Test availability changes | Dem brand *availability* decreased → effect is demand-driven |
+| **Brands taking stands** | Event study (n=101 brands) | Anti-Trump brands became more Democratic |
+
+#### Theoretical Mechanism: Compensatory Consumption
+- Liberals faced identity threat after Trump's unexpected 2016 victory
+- Compensated by consuming more liberal-affiliated brands
+- Asymmetric effect: Democrats polarized more than Republicans
+
+#### Public API
+- **URL**: http://www.social-listening.org
+- **Access**: Brand-level RLPP scores for 307+ brands
+- **Use**: Direct validation of our foot-traffic-based measure
+
+---
+
+### Validation & Extension Opportunities vs. Schoenmueller
+
+#### Direct Validation
+| Their Measure | Our Measure | Expected Relationship |
+|---------------|-------------|----------------------|
+| Twitter RLPP (online following) | Foot traffic partisan lean | Should correlate if both capture consumer ideology |
+| Nielsen BPA (sales × county votes) | Project Oakland (visits × CBG votes) | Very similar construction - high correlation expected |
+
+**Action item**: Query social-listening.org API for overlapping brands, compute correlation with our measure.
+
+#### Replication Opportunities
+1. **Post-election polarization**: Test for same pattern around 2020 election in our foot traffic data
+2. **Demand vs. supply test**: Does Dem brand *traffic* increase in Dem areas while availability is stable?
+3. **Brands taking stands**: Nike/Kaepernick (Sept 2018), Bud Light (April 2023) as event studies
+
+#### Novel Extensions (Our Unique Contribution)
+
+| Extension | What We Add | Why It Matters |
+|-----------|-------------|----------------|
+| **Employee dimension** | Link to PAW employee ideology | First study of employee-consumer alignment |
+| **Within-brand geography** | POI-level variation (same brand, different MSAs) | Decompose brand vs. location effects |
+| **Physical vs. online** | Foot traffic (revealed preference) vs. Twitter (stated affiliation) | Different constructs if diverge |
+| **Extended time period** | 2019-2024 vs. their 2016-2018 | Test 2020 election, Dobbs, continued polarization |
+| **Compensatory consumption test** | Post-2020: Republicans should polarize | Out-of-sample prediction from their theory |
+
+#### Key Theoretical Prediction to Test
+If compensatory consumption drives polarization (their mechanism), then:
+- Post-2016 (Trump wins): Democrats should polarize more ✓ (their finding)
+- Post-2020 (Biden wins): **Republicans should polarize more** ← testable in our data
+
+---
 
 ### Methodological Reference: Smartphone Location Data
 **Poliquin, Hou, Sakakibara, & Testoni (2024)** - "Using Smartphone Location Data for Strategy Research" (*Strategy Science*)
@@ -128,20 +194,65 @@ Combine two unique large-scale datasets to study the relationship between **empl
 
 **Contribution**: First systematic evidence on whether political sorting operates similarly in labor and consumer contexts.
 
-### Option B: Validation - Compare to Twitter-Based Measure
+### Option B: Validation & Extension of Schoenmueller et al. ⭐ HIGH PRIORITY
 
-**Research question**: How does foot-traffic-based consumer partisanship compare to Twitter followership-based measures?
+**Research question**: Does foot-traffic-based consumer partisanship (a) validate Twitter-based measures and (b) show continued/reversed polarization patterns post-2020?
+
+#### Part 1: Measure Validation
 
 **Comparison**:
-- Obtain brand scores from social-listening.org API
-- Correlate with our foot-traffic-based measures
-- Examine where they diverge (online vs. physical engagement)
+- Obtain brand RLPP scores from social-listening.org API (~307 brands)
+- Compute brand-level consumer partisan lean from Project Oakland foot traffic
+- Correlate the two measures at brand level
 
-**Framing options**:
-1. **Validation**: If converge, mutual reinforcement
-2. **Complementary constructs**: If diverge, capturing different phenomena (revealed preference vs. stated affiliation)
+**Expected findings**:
+| Correlation Level | Interpretation | Paper Framing |
+|-------------------|----------------|---------------|
+| High (ρ > 0.5) | Both capture same construct | Mutual validation; foot traffic as revealed preference complement |
+| Moderate (0.3-0.5) | Related but distinct | Complementary constructs; online vs. physical engagement |
+| Low (ρ < 0.3) | Different constructs | Theoretical puzzle - why do they diverge? |
 
-**Contribution**: Methodological comparison; understanding what different measurement approaches capture.
+**Note**: Their Nielsen BPA measure (sales × county votes) is methodologically very similar to ours (visits × CBG votes). Expect high correlation.
+
+#### Part 2: Replication of Post-Election Polarization
+
+**Their finding**: Democrats polarized more than Republicans post-2016 (compensatory consumption)
+
+**Our test**:
+```
+Consumer_Partisan_Lean_bmt = β₁Post2020_t + β₂Baseline_Lean_b + β₃(Post2020_t × Baseline_Lean_b) + Brand_FE + ε
+```
+
+**Prediction from compensatory consumption theory**:
+- Post-2020 (Biden wins): Republicans face identity threat → should polarize more
+- This is an **out-of-sample prediction** from their theory applied to new data/time period
+
+#### Part 3: Demand vs. Supply Test (Replication)
+
+**Their finding**: Availability of Dem brands decreased in Dem counties, but demand increased → demand-driven
+
+**Our test**:
+- Compare change in foot traffic to Democratic brands vs. change in new store openings
+- Use OPENED_ON field to identify supply-side changes
+- If foot traffic increases but new openings don't favor Dem areas → demand-driven polarization
+
+#### Part 4: Event Studies (Brands Taking Stands)
+
+**Events in our data window (2019-2024)**:
+| Event | Date | Expected Effect |
+|-------|------|-----------------|
+| Bud Light/Dylan Mulvaney | April 2023 | Became more Democratic (liberal boycott backfired, conservative boycott succeeded) |
+| Chick-fil-A policy reversal | Nov 2019 | Test both directions |
+| Disney/DeSantis conflict | March 2022+ | Became more Democratic |
+| Target Pride merchandise | May 2023 | Became more Democratic |
+
+**Design**: DiD with brand × month panel, treatment at event date
+
+**Contribution**:
+1. Methodological validation of foot-traffic-based measure
+2. Out-of-sample test of compensatory consumption theory
+3. Extended time series capturing 2020 election and subsequent events
+4. First test of whether physical patronage (foot traffic) shows same patterns as online following (Twitter)
 
 ### Option C: Consequences - Mismatch and Outcomes
 
@@ -570,5 +681,44 @@ MarketShare_jmt = β(RelativeAlignment_jmt) + Brand_FE + Market_FE + Time_FE + �
 
 ---
 
-*Updated: 2026-01-02*
-*Interview in progress*
+## Session Log
+
+### 2026-01-14: Schoenmueller et al. Deep Dive
+- Analyzed "Polarized America: From Political Polarization to Preference Polarization" (Marketing Science 2023)
+- Identified key validation opportunities: correlate foot-traffic measure with their Twitter RLPP via social-listening.org API
+- Identified key extension: Test compensatory consumption prediction post-2020 (Republicans should polarize after Biden win)
+- Updated Option B to be comprehensive validation & extension analysis
+- Added event study opportunities: Bud Light (Apr 2023), Disney (Mar 2022), Target (May 2023)
+- Key theoretical insight: Their mechanism (identity threat → compensatory consumption) generates testable out-of-sample prediction in our data
+
+**Priority action items from this analysis**:
+
+#### Validation vs. Schoenmueller (Option B)
+**Data already downloaded** - no API needed:
+- `reference/other_measures/schoenmueller_et_al/social-listening_PoliticalAffiliation_2017_Feb.csv` (637 brands)
+- `reference/other_measures/schoenmueller_et_al/social-listening_PoliticalAffiliation_2022_Dec.csv` (expanded set)
+
+**Tasks**:
+1. [ ] Build brand crosswalk: Match their `Brand_Name` to Advan `BRANDS` field
+2. [ ] Compute our brand-level consumer partisan lean (visitor-weighted average across POIs per brand)
+3. [ ] Correlate our measure with their `Proportion Democrats` column (Pearson + Spearman)
+4. [ ] Visualize: Scatter plot of our measure vs. theirs, flag outliers
+5. [ ] For brands in both their 2017 and 2022 files, examine temporal shifts (e.g., Nike post-Kaepernick)
+
+**Interpretation guide**:
+| Correlation | Interpretation |
+|-------------|----------------|
+| ρ > 0.5 | Strong validation - measures capture same construct |
+| 0.3 < ρ < 0.5 | Moderate - related but distinct (online vs. physical) |
+| ρ < 0.3 | Weak - need to investigate divergence |
+
+#### Post-2020 Polarization Test
+6. [ ] Test compensatory consumption prediction: Republicans should polarize more post-2020 (Biden win = identity threat)
+
+#### Event Studies
+7. [ ] Bud Light (April 2023), Disney (March 2022+), Target (May 2023) - DiD design
+
+---
+
+*Updated: 2026-01-14*
+*Schoenmueller analysis complete; validation data downloaded*
