@@ -36,6 +36,7 @@ Core data infrastructure for partisan lean measurement.
 | 1.3b Filter to US states only | ⬚ Pending | **BUG**: Data includes Canadian provinces (AB, BC, MB, etc.) and US territories (AS, GU, MP, PR, VI). Filter to 50 US states + DC only. Requires re-running aggregation. |
 | 1.3c Fix multi-brand POI names | ⬚ Pending | **BUG**: Some POIs (esp. auto dealers) have comma-separated brand lists as names (e.g., "Dodge,Chrysler,Lincoln,Ford"). Need to either split, match to parent company, or flag as multi-brand. |
 | 1.3d Investigate missing major brands | ⬚ Pending | **BUG**: Target stores missing (only Target Optical exists). Check if other major retailers are missing from Advan brand data. |
+| 1.3e Fix entity resolution failures | ⬚ Pending | **BUG**: Entity resolution producing garbage matches for multi-brand POIs (e.g., "Chevrolet,Volkswagen,Toyota" → "Société Générale SA"). Review matching quality, add validation rules for multi-brand names. |
 
 #### Phase 2: National Brands (COMPLETE)
 | Task | Status | Notes |
