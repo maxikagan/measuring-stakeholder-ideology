@@ -70,7 +70,7 @@ Validate our measure against external benchmarks.
 
 **Key finding**: Moderate convergent validity. Twitter captures performative political consumption (self-selection); foot traffic captures routine commercial behavior. Measures correlate positively but are not interchangeable.
 
-### Epic 3: Descriptive Analysis ⬚ READY
+### Epic 3: Descriptive Analysis 🟡 PARTIALLY READY
 Document patterns in consumer partisan lean.
 **Scripts**: `scripts/05_descriptive/`
 
@@ -83,9 +83,9 @@ Document patterns in consumer partisan lean.
 | 3.5 Top/bottom brand rankings | ⬚ Pending | Most R vs. most D brands |
 | 3.6 Document descriptive methods | ⬚ Pending | LaTeX appendix: summary stats, decomposition approach |
 
-*Ready: Brand-level aggregation complete, validation complete*
+*Can start with national brands (3,543). Full analysis needs singletons (Task 1.7).*
 
-### Epic 4: Store Performance (SafeGraph Spend) ⬚ READY
+### Epic 4: Store Performance (SafeGraph Spend) 🟡 PARTIALLY READY
 Link partisan lean to business outcomes using SafeGraph Spend.
 **Scripts**: `scripts/06_performance/`
 
@@ -97,9 +97,9 @@ Link partisan lean to business outcomes using SafeGraph Spend.
 | 4.4 Event studies | ⬚ Pending | Elections, Dobbs, etc. |
 | 4.5 Document performance methods | ⬚ Pending | LaTeX appendix: SafeGraph Spend join, TWFE spec |
 
-*Ready: Brand-level aggregation complete*
+*Can start with national brands. Full coverage needs singletons (Task 1.7).*
 
-### Epic 5: Excess Partisan Lean (Gravity Model) ⬚ READY
+### Epic 5: Excess Partisan Lean (Gravity Model) 🟡 PARTIALLY READY
 Control for geography using gravity model.
 **Scripts**: `scripts/07_causal/` (gravity model)
 
@@ -111,7 +111,7 @@ Control for geography using gravity model.
 | 5.4 Calculate excess lean | ⬚ Pending | Actual - expected |
 | 5.5 Document gravity model | ⬚ Pending | LaTeX appendix: model spec, distance decay, category params |
 
-*Ready: Validation complete*
+*Can prototype with national brands. Full geographic coverage needs singletons (Task 1.7).*
 
 ### Epic 6: Employee-Consumer Alignment ⬚ BLOCKED
 Link consumer partisan lean to Politics at Work employee ideology data.
