@@ -6,7 +6,7 @@ import { LeanIndicator, LeanBadge } from '@/components/LeanIndicator'
 import { TimeSeriesChart } from '@/components/TimeSeriesChart'
 
 interface PageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
@@ -15,14 +15,15 @@ export async function generateStaticParams() {
 }
 
 export default async function BrandPage({ params }: PageProps) {
+  const { slug } = await params
   const { brands } = await getBrands()
-  const brand = brands.find(b => b.slug === params.slug)
+  const brand = brands.find(b => b.slug === slug)
 
   if (!brand) {
     notFound()
   }
 
-  const timeSeries = await getBrandTimeSeries(params.slug)
+  const timeSeries = await getBrandTimeSeries(slug)
 
   return (
     <div className="py-8">
