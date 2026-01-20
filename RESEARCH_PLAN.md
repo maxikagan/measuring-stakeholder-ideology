@@ -54,23 +54,23 @@ Core data infrastructure for partisan lean measurement.
 
 **Singleton aggregation approach**: We aggregate unbranded POIs by `name + MSA` (not requiring PAW). This avoids systematic exclusion of businesses not in PAW (small businesses, sole proprietors). We preserve `total_normalized_visits` at each level so that if PAW later identifies the same company across multiple MSAs, we can correctly re-aggregate. See `docs/plans/singleton_aggregation_plan.md` for details.
 
-### Epic 2: Validation (Schoenmueller Comparison) 🔄 IN PROGRESS
+### Epic 2: Validation (Schoenmueller Comparison) ✅ COMPLETE
 Validate our measure against external benchmarks.
 **Scripts**: `scripts/04_validation/`
 
 | Task | Status | Notes |
 |------|--------|-------|
 | 2.1 Load Schoenmueller data | ✅ Done | 1,289 brands, Rep 0.04-0.98 |
-| 2.2 Match brands to Schoenmueller | 🔄 In Progress | Semantic similarity approach |
-| 2.3 Correlation analysis | ⬚ Pending | Scatter plot, R² |
-| 2.4 Divergence analysis | ⬚ Pending | Where/why do measures differ? |
-| 2.5 Generate validation outputs | ⬚ Pending | Scatter plot PNG/PDF, correlation stats |
-| 2.6 Generate LaTeX table rows | ⬚ Pending | Full brand comparison table for appendix |
-| 2.7 Document matching methodology | ⬚ Pending | LaTeX appendix: semantic similarity + Claude review |
+| 2.2 Match brands to Schoenmueller | ✅ Done | Semantic embeddings (text-embedding-3-large) + Jaro-Winkler + manual verification. 1,036 candidate pairs → 662 TRUE matches, 374 FALSE. Final sample: 283 brands with foot traffic data. |
+| 2.3 Correlation analysis | ✅ Done | **r=0.27, p<0.001, ρ=0.40**. National brands (31+ states): r=0.32. Regional: r=0.21. Local: r=0.18 (n.s.). |
+| 2.4 Divergence analysis | ✅ Done | Twitter extremity explains divergence (r=0.72). Trump properties most divergent (92% R Twitter vs 36% R foot traffic). High-traffic brands align well. |
+| 2.5 Generate validation outputs | ✅ Done | Scatter plot PNG/PDF in `outputs/validation/` and `paper/figures/` |
+| 2.6 Generate LaTeX table rows | ✅ Done | Full 283-brand comparison table for appendix |
+| 2.7 Document matching methodology | ✅ Done | LaTeX appendix updated with methodology, stats, conclusion |
 
-*Blocked by: 1.5 (brand-level aggregation)*
+**Key finding**: Moderate convergent validity. Twitter captures performative political consumption (self-selection); foot traffic captures routine commercial behavior. Measures correlate positively but are not interchangeable.
 
-### Epic 3: Descriptive Analysis ⬚ BLOCKED
+### Epic 3: Descriptive Analysis ⬚ READY
 Document patterns in consumer partisan lean.
 **Scripts**: `scripts/05_descriptive/`
 
@@ -83,9 +83,9 @@ Document patterns in consumer partisan lean.
 | 3.5 Top/bottom brand rankings | ⬚ Pending | Most R vs. most D brands |
 | 3.6 Document descriptive methods | ⬚ Pending | LaTeX appendix: summary stats, decomposition approach |
 
-*Blocked by: 1.5 (brand-level aggregation)*
+*Ready: Brand-level aggregation complete, validation complete*
 
-### Epic 4: Store Performance (SafeGraph Spend) ⬚ BLOCKED
+### Epic 4: Store Performance (SafeGraph Spend) ⬚ READY
 Link partisan lean to business outcomes using SafeGraph Spend.
 **Scripts**: `scripts/06_performance/`
 
@@ -97,9 +97,9 @@ Link partisan lean to business outcomes using SafeGraph Spend.
 | 4.4 Event studies | ⬚ Pending | Elections, Dobbs, etc. |
 | 4.5 Document performance methods | ⬚ Pending | LaTeX appendix: SafeGraph Spend join, TWFE spec |
 
-*Blocked by: 1.5 (brand-level aggregation)*
+*Ready: Brand-level aggregation complete*
 
-### Epic 5: Excess Partisan Lean (Gravity Model) ⬚ BLOCKED
+### Epic 5: Excess Partisan Lean (Gravity Model) ⬚ READY
 Control for geography using gravity model.
 **Scripts**: `scripts/07_causal/` (gravity model)
 
@@ -111,7 +111,7 @@ Control for geography using gravity model.
 | 5.4 Calculate excess lean | ⬚ Pending | Actual - expected |
 | 5.5 Document gravity model | ⬚ Pending | LaTeX appendix: model spec, distance decay, category params |
 
-*Blocked by: Epic 2 validation*
+*Ready: Validation complete*
 
 ### Epic 6: Employee-Consumer Alignment ⬚ BLOCKED
 Link consumer partisan lean to Politics at Work employee ideology data.
@@ -147,22 +147,26 @@ Establish causal relationships.
 
 ## Current Sprint
 
-**Focus**: Epic 2 (validation) + Epic 1 Phase 3 (singletons) in parallel
+**Focus**: Epic 3 (descriptive analysis) + Epic 1 Phase 3 (singletons) in parallel
 
-**Completed this session**:
+**Completed recently**:
+- ✅ Epic 2 COMPLETE: Schoenmueller validation (r=0.27, p<0.001)
+  - Brand matching: semantic embeddings + Jaro-Winkler + manual verification
+  - 283 brands matched with foot traffic data
+  - Scatter plot, correlation stats, divergence analysis all complete
+  - LaTeX appendix fully updated with methodology and results
 - ✅ Task 1.5a: Brand-month aggregation (273K rows, 3,543 brands)
-- ✅ Task 2.1: Load Schoenmueller data (1,289 brands)
 
 **In progress**:
-- 🔄 Task 2.2: Schoenmueller brand matching (semantic similarity + manual Claude review)
-  - 257 exact matches, 411 contains matches, 368 under manual review
-- 🔄 Task 1.7: Singleton entity resolution (pilot job submitted for Columbus OH)
+- 🔄 Task 1.7: Singleton entity resolution (pilot job for Columbus OH)
 
 **Next up**:
-1. Task 2.3-2.6: Correlation analysis, divergence, validation outputs, LaTeX tables
-2. Task 2.7: Document matching methodology in appendix
-3. Task 3.1-3.2: Descriptive analysis (now unblocked)
-4. Task 1.8: Document aggregation methodology in appendix
+1. Epic 3: Descriptive analysis (now unblocked)
+   - Task 3.1: Brand distributions (histogram, KDE)
+   - Task 3.2: Variance decomposition (brand vs. location effects)
+   - Task 3.5: Top/bottom brand rankings
+2. Task 1.9: Document aggregation methodology in appendix
+3. Epic 4: Store performance (SafeGraph Spend linkage)
 
 ---
 
@@ -183,6 +187,11 @@ Establish causal relationships.
 | Schoenmueller Twitter Scores | ✅ 1,289 brands | `reference/other_measures/schoenmueller_et_al/` |
 | PCI Time Series | ✅ 1981-2025 | `reference/partisan_conflict_index.csv` |
 | PAW Company × MSA | ✅ 4.1M companies | `project_oakland/outputs/paw_company_msa.parquet` |
+| **Validation Outputs** | | |
+| Validation Comparison | ✅ 283 brands | `outputs/validation/validation_comparison.csv` |
+| Labeled Matches | ✅ 1,036 pairs | `outputs/validation/labeled_matches.csv` |
+| Scatter Plot | ✅ PNG/PDF | `outputs/validation/validation_scatter.pdf`, `paper/figures/` |
+| Divergent Brands | ✅ Top 20 | `outputs/validation/divergent_brands.csv` |
 
 ---
 

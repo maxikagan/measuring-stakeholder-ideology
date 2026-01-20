@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=singleton_phase1
 #SBATCH --account=fc_basicperms
-#SBATCH --partition=savio3
+#SBATCH --partition=savio2
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
@@ -23,7 +23,8 @@ echo "============================================================"
 
 cd /global/home/users/maxkagan/measuring_stakeholder_ideology
 
-module load anaconda3/2024.02-1-11.4
+module load gcc/11.4.0
+module load python/3.10.12-gcc-11.4.0
 
 if [ -z "$OPENAI_API_KEY" ]; then
     echo "ERROR: OPENAI_API_KEY not set"
@@ -31,7 +32,7 @@ if [ -z "$OPENAI_API_KEY" ]; then
 fi
 echo "API key configured (length: ${#OPENAI_API_KEY})"
 
-python -u scripts/03_entity_resolution/12_singleton_phase1_features.py --msa "$MSA"
+python3 -u scripts/03_entity_resolution/12_singleton_phase1_features.py --msa "$MSA"
 
 echo ""
 echo "============================================================"
