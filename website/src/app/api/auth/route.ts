@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const SITE_PASSWORD = process.env.SITE_PASSWORD || 'research2026'
+const SITE_PASSWORD = process.env.SITE_PASSWORD || 'stakeholder'
 
 export async function POST(request: NextRequest) {
   try {
