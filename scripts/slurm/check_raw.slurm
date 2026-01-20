@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=check_raw
 #SBATCH --account=fc_basicperms
-#SBATCH --partition=savio3
+#SBATCH --partition=savio2
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1

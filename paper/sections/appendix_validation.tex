@@ -60,6 +60,16 @@ Final validation sample (with foot traffic data) & \textbf{283} \\
 \end{threeparttable}
 \end{table}
 
+\subsubsection{Sample Attrition}
+
+The matching process involves substantial attrition at each stage. We document the sources of sample loss to clarify which types of brands are excluded from the validation analysis.
+
+\textbf{Stage 1: No Similar Brand Name (694 brands lost).} Of the 1,289 Schoenmueller et al. brands, 694 (54\%) had no Advan brand with sufficiently similar name (neither Jaro-Winkler $\geq$ 0.85 nor cosine similarity $\geq$ 0.85). These are predominantly brands without physical retail presence in Advan's point-of-interest data: digital-only companies (Adobe, Airbnb, Netflix), media organizations (ABC, CNN, Fox News), B2B enterprises (Accenture, Salesforce), sports teams (49ers, Lakers), and advocacy groups (ACLU, NRA). The Schoenmueller et al. dataset includes any brand with a Twitter presence, while Advan covers only establishments with physical locations that generate foot traffic.
+
+\textbf{Stage 2: False Candidate Matches (179 brands lost).} Of the 595 brands with candidate pairs, 179 (30\%) had only false matches upon manual verification. These are near-matches where string similarity was high but the brands are distinct entities. Examples include: ``Ally'' (financial services) matched to ``Rally'' (automotive); ``Univision'' (media) matched to ``UniVista Insurance''; ``Columbia Crest'' (winery) matched to ``Columbia Bank'' and ``Columbia Sportswear''. Such cases illustrate why manual verification is essential for brand matching.
+
+\textbf{Stage 3: No Foot Traffic Data (133 brands lost).} Of the 416 brands with verified true matches, 133 (32\%) lacked sufficient foot traffic data for partisan lean estimation. These include brands present in Advan's POI database but with minimal or no visitor data during our study period: luxury brands with limited U.S. locations (Armani, Aston Martin, Bang \& Olufsen), defunct or restructured retailers (Aeropostale, Barney's New York), and brands whose locations may not generate measurable foot traffic (3M corporate offices, Apple---which has separate branded entries). The final validation sample of 283 brands represents those with both verified matches and sufficient visitor data.
+
 \subsection{Correlation Analysis}
 
 Table~\ref{tab:validation_correlation} presents correlation coefficients between our foot traffic-based consumer partisan lean and the Schoenmueller et al. Twitter-based measure.

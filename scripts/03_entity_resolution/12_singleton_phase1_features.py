@@ -63,36 +63,6 @@ def contains_match(a: str, b: str) -> bool:
     return a_lower in b_lower or b_lower in a_lower
 
 
-def sanitize_names(names: list) -> tuple:
-    """
-    Sanitize names for embedding API: remove empty/whitespace-only strings,
-    truncate long strings, replace invalid characters.
-    Returns (clean_names, original_to_clean_idx mapping).
-    """
-    clean_names = []
-    orig_to_clean = {}
-
-    for i, name in enumerate(names):
-        if name is None:
-            continue
-        if not isinstance(name, str):
-            name = str(name)
-
-        name = name.strip()
-        if not name:
-            continue
-
-        name = name[:8000]
-        name = ''.join(c if c.isprintable() or c in ' \t' else ' ' for c in name)
-        name = ' '.join(name.split())
-
-        if name:
-            orig_to_clean[i] = len(clean_names)
-            clean_names.append(name)
-
-    return clean_names, orig_to_clean
-
-
 def get_embeddings_batch(client: OpenAI, texts: list, model: str = EMBEDDING_MODEL) -> list:
     """Get embeddings for a batch of texts."""
     response = client.embeddings.create(input=texts, model=model)
@@ -228,17 +198,27 @@ def main():
     paw_msa = paw[paw['msa'] == msa].copy()
     print(f"  Loaded {len(paw_msa):,} PAW companies in {msa}")
 
-    raw_poi_names = pois['location_name'].unique().tolist()
-    raw_company_names = paw_msa['company_name'].unique().tolist()
+    def sanitize_single(name):
+        if name is None or not isinstance(name, str):
+            return ""
+        name = name.strip()[:8000]
+        name = ''.join(c if c.isprintable() or c in ' \t' else ' ' for c in name)
+        return ' '.join(name.split())
 
-    unique_poi_names, poi_orig_to_clean = sanitize_names(raw_poi_names)
-    unique_company_names, company_orig_to_clean = sanitize_names(raw_company_names)
+    pois['location_name_clean'] = pois['location_name'].apply(sanitize_single)
+    paw_msa['company_name_clean'] = paw_msa['company_name'].apply(sanitize_single)
 
-    print(f"  Unique POI names: {len(unique_poi_names):,} (from {len(raw_poi_names):,} raw)")
-    print(f"  Unique company names: {len(unique_company_names):,} (from {len(raw_company_names):,} raw)")
+    pois = pois[pois['location_name_clean'] != ''].copy()
+    paw_msa = paw_msa[paw_msa['company_name_clean'] != ''].copy()
 
-    poi_name_to_placekeys = pois.groupby('location_name')['placekey'].apply(list).to_dict()
-    company_name_to_rcids = paw_msa.groupby('company_name')['rcid'].apply(lambda x: list(x.unique())).to_dict()
+    unique_poi_names = pois['location_name_clean'].unique().tolist()
+    unique_company_names = paw_msa['company_name_clean'].unique().tolist()
+
+    print(f"  Unique POI names: {len(unique_poi_names):,}")
+    print(f"  Unique company names: {len(unique_company_names):,}")
+
+    poi_name_to_placekeys = pois.groupby('location_name_clean')['placekey'].apply(list).to_dict()
+    company_name_to_rcids = paw_msa.groupby('company_name_clean')['rcid'].apply(lambda x: list(x.unique())).to_dict()
 
     print("\n[2] Generating embeddings...")
     client = OpenAI()
@@ -257,6 +237,8 @@ def main():
 
     candidates['placekeys'] = candidates['location_name'].map(poi_name_to_placekeys)
     candidates['rcids'] = candidates['company_name'].map(company_name_to_rcids)
+    candidates['placekeys'] = candidates['placekeys'].apply(lambda x: x if isinstance(x, list) else [])
+    candidates['rcids'] = candidates['rcids'].apply(lambda x: x if isinstance(x, list) else [])
     candidates['n_pois'] = candidates['placekeys'].apply(len)
     candidates['msa'] = msa
 
