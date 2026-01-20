@@ -4,20 +4,38 @@
 
 ---
 
+## Repository Structure
+
+```
+scripts/
+├── 01_data_prep/           # Election data, CBG lookup, schema
+├── 02_partisan_lean/       # Core computation pipeline
+├── 03_entity_resolution/   # Brand/company matching
+├── 04_validation/          # Schoenmueller comparison
+├── 05_descriptive/         # Brand distributions, R reports
+├── 06_performance/         # SafeGraph Spend, POI lifecycle
+├── 07_causal/              # Gravity model, DiD, etc.
+└── archive/                # Old/superseded scripts
+```
+
+---
+
 ## Epics & Tasks
 
 ### Epic 1: Data Pipeline ✅ COMPLETE
 Core data infrastructure for partisan lean measurement.
+**Scripts**: `scripts/01_data_prep/`, `scripts/02_partisan_lean/`, `scripts/03_entity_resolution/`
 
 | Task | Status | Notes |
 |------|--------|-------|
 | 1.1 Partisan lean computation | ✅ Done | 79 months, 596M rows |
 | 1.2 Entity resolution (brands) | ✅ Done | 3,872 brands, 1.48M POIs |
 | 1.3 Extract normalized visits | ✅ Done | 2,096 files extracted |
-| 1.4 Join normalized visits | 🔄 Running | Job 31677682 |
+| 1.4 Join normalized visits | 🔄 Running | Job 31680680 |
 
 ### Epic 2: Validation (Option B)
 Validate our measure against external benchmarks.
+**Scripts**: `scripts/04_validation/`
 
 | Task | Status | Notes |
 |------|--------|-------|
@@ -29,6 +47,7 @@ Validate our measure against external benchmarks.
 
 ### Epic 3: Descriptive Analysis (Option A)
 Document patterns in consumer partisan lean.
+**Scripts**: `scripts/05_descriptive/`
 
 | Task | Status | Notes |
 |------|--------|-------|
@@ -40,16 +59,18 @@ Document patterns in consumer partisan lean.
 
 ### Epic 4: Store Performance (Option D)
 Link partisan lean to business outcomes using SafeGraph Spend.
+**Scripts**: `scripts/06_performance/`
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 4.1 Explore SafeGraph Spend | ⬚ Pending | Structure, coverage, quality |
+| 4.1 Explore SafeGraph Spend | ✅ Done | 83 months, 93% POI overlap |
 | 4.2 Match to partisan lean | ⬚ Pending | Join on PLACEKEY |
 | 4.3 Within-store TWFE | ⬚ Pending | Spending ~ lean × salience |
 | 4.4 Event studies | ⬚ Pending | Elections, Dobbs, etc. |
 
 ### Epic 5: Excess Partisan Lean
 Control for geography using gravity model.
+**Scripts**: `scripts/07_causal/` (gravity model)
 
 | Task | Status | Notes |
 |------|--------|-------|
@@ -60,6 +81,7 @@ Control for geography using gravity model.
 
 ### Epic 6: Employee-Consumer Alignment (Option A extended)
 Link to Politics at Work employee data.
+**Scripts**: `scripts/03_entity_resolution/` (singletons), `scripts/07_causal/`
 
 | Task | Status | Notes |
 |------|--------|-------|
@@ -70,6 +92,7 @@ Link to Politics at Work employee data.
 
 ### Epic 7: Causal Identification (Later Phase)
 Establish causal relationships.
+**Scripts**: `scripts/07_causal/`
 
 | Task | Status | Notes |
 |------|--------|-------|
