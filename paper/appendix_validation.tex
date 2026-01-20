@@ -26,11 +26,13 @@ The resulting dataset covers 1,289 brands across multiple consumer categories, i
 We link Schoenmueller et al. brand scores to our Advan-based measures using brand name matching. The linking process involves:
 
 \begin{enumerate}
-    \item \textbf{Exact Matching}: Direct string matching on standardized brand names (uppercase, punctuation removed).
+    \item \textbf{Semantic Embedding}: We embed both Schoenmueller and Advan brand names using OpenAI's \texttt{text-embedding-3-large} model (1536 dimensions), then identify candidate matches via cosine similarity.
 
-    \item \textbf{Fuzzy Matching}: For unmatched brands, we apply Levenshtein distance-based fuzzy matching with manual review of candidate matches.
+    \item \textbf{String Distance}: We compute Jaro-Winkler similarity for all candidate pairs, which effectively handles common brand name variations (e.g., ``McDonalds'' vs. ``McDonald's'', ``7eleven'' vs. ``7-Eleven'').
 
-    \item \textbf{Manual Curation}: Research assistants review all matches to ensure accuracy, particularly for brands with multiple naming conventions (e.g., ``McDonald's'' vs. ``McDonalds'').
+    \item \textbf{Candidate Selection}: We retain pairs with either (a) Jaro-Winkler $\geq$ 0.85, or (b) cosine similarity $\geq$ 0.85 and rank 1, yielding 1,036 candidate pairs.
+
+    \item \textbf{Manual Verification}: Each candidate pair was manually classified as a true match or false positive, accounting for brand variants (e.g., ``Foot Locker'' and ``Kids Foot Locker'' both match to ``Footlocker'').
 \end{enumerate}
 
 \begin{table}[htbp]
@@ -43,16 +45,17 @@ We link Schoenmueller et al. brand scores to our Advan-based measures using bran
 & Count \\
 \midrule
 Schoenmueller et al. brands & 1,289 \\
-Exact matches to Advan & XXX \\
-Fuzzy matches (validated) & XXX \\
-No match found & XXX \\
+Candidate pairs generated & 1,036 \\
+Manually verified as TRUE match & 662 \\
+Manually verified as FALSE match & 374 \\
 \midrule
-\textbf{Final matched sample} & \textbf{XXX} \\
+Unique Schoenmueller brands matched & 416 \\
+Final validation sample (with foot traffic data) & \textbf{283} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \small
-\item \textit{Notes}: Matching between Schoenmueller et al. (2023) Twitter-based brand scores and Advan branded POI data. Exact matches use standardized brand names. Fuzzy matches use Levenshtein distance $\leq$ 2 with manual validation.
+\item \textit{Notes}: Matching between Schoenmueller et al. (2023) Twitter-based brand scores and Advan branded POI data. Candidate pairs selected via cosine similarity of semantic embeddings and Jaro-Winkler string distance. Each pair manually verified. Final sample excludes brands without foot traffic-based partisan lean estimates.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
@@ -70,22 +73,17 @@ Table~\ref{tab:validation_correlation} presents correlation coefficients between
 \toprule
 Sample & N & Pearson $r$ & Spearman $\rho$ \\
 \midrule
-All matched brands & XXX & XX.XX & XX.XX \\
+All matched brands & 283 & 0.27*** & 0.40*** \\
 \midrule
-\textit{By Category} & & & \\
-Retail & XXX & XX.XX & XX.XX \\
-Restaurants & XXX & XX.XX & XX.XX \\
-Consumer Services & XXX & XX.XX & XX.XX \\
-\midrule
-\textit{By Brand Size} & & & \\
-Large (1000+ locations) & XXX & XX.XX & XX.XX \\
-Medium (100--999 locations) & XXX & XX.XX & XX.XX \\
-Small ($<$100 locations) & XXX & XX.XX & XX.XX \\
+\textit{By Brand Geographic Coverage} & & & \\
+National (31+ states) & 120 & 0.32*** & 0.44*** \\
+Regional (6--30 states) & 113 & 0.21** & 0.33*** \\
+Local (1--5 states) & 25 & 0.18 & 0.25 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \small
-\item \textit{Notes}: Correlations between foot traffic-based visitor Republican lean (our measure) and Twitter follower-based conservative share (Schoenmueller et al. 2023). Pearson $r$ is linear correlation; Spearman $\rho$ is rank correlation. Expected pattern: Positive correlations in the range of 0.4--0.7, with stronger correlations for larger brands with more precise estimates.
+\item \textit{Notes}: Correlations between foot traffic-based visitor Republican lean (our measure, 2020 election data) and Twitter follower-based conservative share (Schoenmueller et al. 2023). Pearson $r$ is linear correlation; Spearman $\rho$ is rank correlation. *** $p < 0.001$, ** $p < 0.01$, * $p < 0.05$. National brands show stronger correlations, consistent with larger sample sizes and more precise estimates.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
@@ -94,10 +92,16 @@ Small ($<$100 locations) & XXX & XX.XX & XX.XX \\
 
 Figure~\ref{fig:validation_scatter} presents a scatter plot comparing the two measures at the brand level.
 
-\placeholderfigure{Figure A1: Foot Traffic vs. Twitter-Based Consumer Partisan Lean}
-{Scatter plot with Schoenmueller et al. Twitter-based conservative share on X-axis and our foot traffic-based Republican lean on Y-axis. Each point is a matched brand. 45-degree line indicates perfect agreement. Best-fit regression line overlaid. Expected pattern: Positive relationship with moderate scatter. Correlation $r \approx$ 0.5--0.7. Notable outliers labeled (brands where the two measures substantially diverge).}
-{Validation: Foot Traffic-Based vs. Twitter-Based Consumer Partisan Lean. Each observation is a brand matched across both datasets. X-axis: Conservative share of Twitter followers from Schoenmueller et al. (2023). Y-axis: Visit-weighted average Republican two-party vote share of visitor home CBGs (our measure). N = XXX brands. Correlation: $r$ = XX.XX. The 45-degree line indicates perfect agreement between measures.}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/validation_scatter.pdf}
+\caption{Validation: Foot Traffic-Based vs. Twitter-Based Consumer Partisan Lean}
 \label{fig:validation_scatter}
+\begin{minipage}{0.9\textwidth}
+\footnotesize
+\textit{Notes}: Each observation is a brand matched across both datasets (N = 283). X-axis: Conservative share of Twitter followers from Schoenmueller et al. (2023). Y-axis: Visit-weighted average Republican two-party vote share of visitor home CBGs (our measure). Dashed line indicates 45-degree perfect agreement. Red solid line is OLS best fit (slope = 0.13, SE = 0.03). Point size proportional to log total visits. Pearson $r$ = 0.27, $p < 0.001$.
+\end{minipage}
+\end{figure}
 
 \subsection{Sources of Divergence}
 
@@ -169,7 +173,9 @@ Brand & Locations & Foot Traffic & Twitter & Diff \\
 
 \subsection{Conclusion}
 
-The validation analysis reveals [moderate/strong] convergent validity between our foot traffic-based measure and the Schoenmueller et al. Twitter-based measure. The positive correlation (expected $r \approx$ 0.5--0.7) indicates that both approaches capture meaningful variation in consumer political composition, despite using entirely different data sources and methodologies.
+The validation analysis reveals moderate convergent validity between our foot traffic-based measure and the Schoenmueller et al. Twitter-based measure. The positive correlation ($r = 0.27$, $p < 0.001$) indicates that both approaches capture meaningful variation in consumer political composition, despite using entirely different data sources and methodologies. The Spearman rank correlation ($\rho = 0.40$) suggests stronger agreement in relative orderings than absolute values.
+
+The modest linear correlation reflects systematic differences between the measures rather than noise. Twitter followers self-select based on brand affinity and political identity, while physical visitors are constrained by geography and practical needs. Brands with extreme Twitter followings (e.g., Trump properties with 92\% conservative followers) show the largest divergence from foot traffic patterns, consistent with ideological self-selection on social media. Indeed, the correlation between a brand's Twitter-based extremity and divergence from foot traffic is $r = 0.72$, indicating that Twitter captures performative political consumption while foot traffic captures routine commercial behavior.
 
 The measures are not interchangeable. Each has strengths and limitations: our measure captures actual physical visits across the full geographic footprint; the Twitter measure may better capture social media-engaged consumers and brand perception. The choice between measures should depend on the research question.
 

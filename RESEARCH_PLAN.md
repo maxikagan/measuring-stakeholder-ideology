@@ -25,18 +25,34 @@ scripts/
 ### Epic 1: Data Pipeline 🔄 IN PROGRESS
 Core data infrastructure for partisan lean measurement.
 **Scripts**: `scripts/01_data_prep/`, `scripts/02_partisan_lean/`, `scripts/03_entity_resolution/`
+**Detailed plan**: `docs/plans/data_pipeline_plan.md`
 
+#### Phase 1: POI-Level Partisan Lean (COMPLETE)
 | Task | Status | Notes |
 |------|--------|-------|
-| 1.1 Partisan lean computation | ✅ Done | 79 months, 596M rows |
-| 1.2 Entity resolution (national brands) | ✅ Done | 3,872 brands, 1.48M POIs |
-| 1.3 Extract normalized visits | ✅ Done | 2,096 files extracted |
-| 1.4 Join normalized visits | ✅ Done | 79 files completed |
-| 1.5a Aggregate brand-level lean (national) | ✅ Done | 273K brand-months, 3,543 brands |
-| 1.6 POI → MSA mapping | ✅ Done | 6.31M POIs with crosswalk |
-| 1.7 Entity resolution (singletons) | 🔄 In Progress | Pilot job 31705616 (Columbus OH) |
-| 1.5b Aggregate brand-level lean (singletons) | ⬚ Pending | Depends on 1.7 |
-| 1.8 Document aggregation methodology | ⬚ Pending | LaTeX appendix: data sources, filters, weighted avg formula |
+| 1.1 Partisan lean computation | ✅ Done | 79 months, 596M POI-month rows. Weighted avg of CBG election results by visitor origin. |
+| 1.2 Extract normalized visits | ✅ Done | 2,096 raw Advan files → extracted `normalized_visits_by_state_scaling` column |
+| 1.3 Join normalized visits | ✅ Done | Merged normalized visits into partisan lean data (79 monthly parquet files) |
+
+#### Phase 2: National Brands (COMPLETE)
+| Task | Status | Notes |
+|------|--------|-------|
+| 1.4 Entity resolution (national brands) | ✅ Done | Matched 3,872 Advan brands → companies (gvkey, ticker, rcid). 1.48M POIs covered. |
+| 1.5a Aggregate to brand × month | ✅ Done | 273K brand-months, 3,543 brands. Weighted avg using normalized_visits. Output: `brand_month_partisan_lean.parquet` |
+
+#### Phase 3: Singletons / Unbranded POIs (IN PROGRESS)
+| Task | Status | Notes |
+|------|--------|-------|
+| 1.6 POI → MSA mapping | ✅ Done | 6.31M POIs mapped to 366 MSAs via CBG crosswalk |
+| 1.7 Aggregate to name × MSA × month | ⬚ Pending | Group unbranded POIs by (poi_name, msa, year_month). Preserves `total_normalized_visits` for later rollup. |
+| 1.8 (Optional) Link to PAW for cross-MSA rollup | ⬚ Pending | If PAW identifies same company across MSAs, can re-aggregate using preserved weights. See Epic 6. |
+
+#### Phase 4: Documentation
+| Task | Status | Notes |
+|------|--------|-------|
+| 1.9 Document aggregation methodology | ⬚ Pending | LaTeX appendix: data sources, filters (95% pct_visitors_matched), weighted avg formula, singleton approach |
+
+**Singleton aggregation approach**: We aggregate unbranded POIs by `name + MSA` (not requiring PAW). This avoids systematic exclusion of businesses not in PAW (small businesses, sole proprietors). We preserve `total_normalized_visits` at each level so that if PAW later identifies the same company across multiple MSAs, we can correctly re-aggregate. See `docs/plans/singleton_aggregation_plan.md` for details.
 
 ### Epic 2: Validation (Schoenmueller Comparison) 🔄 IN PROGRESS
 Validate our measure against external benchmarks.
@@ -97,19 +113,23 @@ Control for geography using gravity model.
 
 *Blocked by: Epic 2 validation*
 
-### Epic 6: Employee-Consumer Alignment 🔄 PREREQUISITES DONE
-Link to Politics at Work employee data.
+### Epic 6: Employee-Consumer Alignment ⬚ BLOCKED
+Link consumer partisan lean to Politics at Work employee ideology data.
 **Scripts**: `scripts/07_causal/`
+**Detailed plan**: `docs/plans/entity_resolution_paw_linkage.md`
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 6.1 PAW Company × MSA table | ✅ Done | 4.1M companies, 366 MSAs |
-| 6.2 Link brands to PAW employers | ✅ Done | Via brand entity resolution |
-| 6.3 Compute employee partisanship | ⬚ Pending | From PAW VR scores |
-| 6.4 Alignment correlation | ⬚ Pending | Employee vs. consumer |
-| 6.5 Document PAW linkage | ⬚ Pending | LaTeX appendix: PAW data, VR scores, MSA matching |
+| 6.1 PAW Company × MSA table | ✅ Done | 4.1M companies, 366 MSAs. Source: Politics at Work voter registration + employment records. |
+| 6.2 Link national brands to PAW | ✅ Done | Via brand entity resolution (Task 1.4). 3,872 brands matched to rcid. |
+| 6.3 Link singletons to PAW | ⬚ Pending | Match name×MSA entities (from Task 1.7) to PAW companies. Enables cross-MSA rollup for regional chains. |
+| 6.4 Compute employee partisanship | ⬚ Pending | Aggregate PAW VR scores (voter registration) by company. |
+| 6.5 Employee-consumer alignment analysis | ⬚ Pending | Correlate employee partisan lean with consumer partisan lean at company level. |
+| 6.6 Document PAW linkage | ⬚ Pending | LaTeX appendix: PAW data description, VR score methodology, MSA matching, coverage limitations. |
 
-*Depends on: Epic 1 (data pipeline) completion*
+*Depends on: Epic 1 completion (especially Task 1.7 for singletons)*
+
+**PAW coverage limitation**: PAW only includes companies with employees who have voter registration records. This systematically excludes sole proprietors, very small businesses, and businesses with unregistered employees. We document this as a limitation and note that the name×MSA aggregation in Epic 1 provides broader coverage for consumer-side analysis.
 
 ### Epic 7: Causal Identification (Later Phase) ⬚ NOT STARTED
 Establish causal relationships.
@@ -127,14 +147,14 @@ Establish causal relationships.
 
 ## Current Sprint
 
-**Focus**: Epic 1 (singletons) + Epic 2 (validation) in parallel
+**Focus**: Epic 1 Phase 3 (singletons) + Epic 2 (validation) in parallel
 
 **Immediate next steps**:
-1. ✅ **Task 1.5a: Aggregate brand-level lean (national)** — DONE
-2. Task 1.7: Singleton entity resolution (pilot running)
-3. Task 2.2: Complete Schoenmueller brand matching
-4. Task 2.3-2.5: Correlation analysis, divergence, LaTeX appendix
-5. Tasks 3.1-3.2: Brand distributions and variance decomposition
+1. ✅ **Task 1.5a: Aggregate brand-level lean (national)** — DONE (273K brand-months)
+2. **Task 1.7: Aggregate singletons to name × MSA × month** — write script, preserving weights
+3. Task 2.2: Complete Schoenmueller brand matching (semantic similarity in progress)
+4. Task 2.3-2.5: Correlation analysis, divergence, validation outputs
+5. Task 1.9: Document aggregation methodology in LaTeX appendix
 
 ---
 
@@ -142,13 +162,17 @@ Establish causal relationships.
 
 | Component | Status | Location |
 |-----------|--------|----------|
-| Partisan Lean | ✅ 79 months | `outputs/national/partisan_lean_*.parquet` |
-| Partisan Lean + Normalized | ✅ 79 months | `outputs/national_with_normalized/` |
-| Entity Resolution | ✅ 3,872 brands | `outputs/entity_resolution/brand_matches_validated.parquet` |
-| Brand-Month Aggregated | ✅ 273K rows | `outputs/brand_month_aggregated/brand_month_partisan_lean.parquet` |
+| **POI-Level Data** | | |
+| Partisan Lean + Normalized | ✅ 79 months, 596M rows | `outputs/national_with_normalized/` |
 | POI → MSA Mapping | ✅ 6.31M POIs | `outputs/entity_resolution/unbranded_pois_by_msa/` |
+| **National Brands** | | |
+| Entity Resolution | ✅ 3,872 brands → companies | `outputs/entity_resolution/brand_matches_validated.parquet` |
+| Brand × Month Aggregated | ✅ 273K rows, 3,543 brands | `outputs/brand_month_aggregated/brand_month_partisan_lean.parquet` |
+| **Singletons** | | |
+| Name × MSA × Month Aggregated | ⬚ Pending | `outputs/singleton_name_msa_aggregated/` (planned) |
+| **External Data** | | |
 | SafeGraph Spend | ✅ 83 months | `01_foot_traffic_location/safegraph/.../spend/` |
-| Schoenmueller | ✅ 1,289 brands | `reference/other_measures/schoenmueller_et_al/` |
+| Schoenmueller Twitter Scores | ✅ 1,289 brands | `reference/other_measures/schoenmueller_et_al/` |
 | PCI Time Series | ✅ 1981-2025 | `reference/partisan_conflict_index.csv` |
 | PAW Company × MSA | ✅ 4.1M companies | `project_oakland/outputs/paw_company_msa.parquet` |
 

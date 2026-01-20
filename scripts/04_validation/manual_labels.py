@@ -253,6 +253,864 @@ MANUAL_LABELS = {
     ('Rollsroyce', 'Rolls‑Royce Motor Cars,Lamborghini'): True,
     ('Rollsroyce', 'Rolls‑Royce Motor Cars,Bentley Motors'): True,
     ('Rollsroyce', 'Rolls‑Royce Motor Cars,Aston Martin'): True,
+
+    # ===== ADDITIONAL LABELS (batch 2 - remaining 181 matches) =====
+
+    # Hardware/retail store confusions (FALSE)
+    ('Acehardware', 'Aubuchon Hardware'): False,  # Ace Hardware vs Aubuchon Hardware
+    ('Acmemarkets', 'Acorn Markets'): False,  # Acme vs Acorn
+    ('Adamsgolf', 'Adams Drugs'): False,  # Golf equipment vs pharmacy
+
+    # Airline/travel confusions (FALSE)
+    ('Alaskaair', 'Alaska Commercial Company'): False,  # Alaska Airlines vs retailer
+    ('Travelocity', 'Travelodge'): False,  # Travel booking vs hotel chain
+
+    # Cosmetics confusions (FALSE)
+    ('Almaycosmetics', 'MAC Cosmetics'): False,  # Almay vs MAC, different brands
+    ('Benefitbeauty', 'Benefit Cosmetics'): True,  # Same brand!
+
+    # Altria/news (FALSE)
+    ('Altrianews', 'Altierus'): False,  # Altria news vs education company
+
+    # Amazon variants - different services, not the same brand manifestation (FALSE)
+    ('Amazonfashion', 'Amazon Hub'): False,  # Online fashion vs lockers
+    ('Amazonpay', 'Amazon Hub'): False,  # Payment service vs lockers
+    ('Amazonprimenow', 'Amazon Fresh'): False,  # Discontinued service vs grocery
+    ('Amazonprimenow', 'Amazon Go'): False,  # Delivery vs convenience stores
+
+    # American-named confusions (FALSE)
+    ('Americancancer', 'American Family Care'): False,  # Cancer society vs urgent care
+    ('Americatonight', 'AmericInn'): False,  # TV show vs hotel
+
+    # Museum vs hotel (FALSE)
+    ('Amnh', 'Aman'): False,  # American Museum of Natural History vs Aman hotels
+
+    # Apple confusions (FALSE)
+    ('Applenews', 'AppleCare'): False,  # News app vs support service
+    ('Applenews', 'Applegreen'): False,  # Apple vs Applegreen convenience stores
+
+    # Gas station (FALSE)
+    ('Arco', 'Arol'): False,  # ARCO gas vs unknown
+
+    # Ashley confusions (FALSE)
+    ('Ashleyhomestore', 'Ashley Stewart'): False,  # Furniture vs plus-size clothing
+
+    # Athleta confusion (FALSE)
+    ('Athleta', 'Athletico Physical Therapy'): False,  # Clothing vs PT
+
+    # Auto/finance (FALSE)
+    ('Automatic', 'Autofin'): False,  # Different companies
+
+    # Bank confusions - different banks (FALSE)
+    ('Bankofamerica', 'Bank of Hawaii'): False,
+    ('Bankofamerica', 'Bank of Oklahoma'): False,
+    ('Citibank', 'Citizens Bank & Trust'): False,
+    ('Citizensbank', 'CIT Bank'): False,
+    ('Citi', 'Citadines'): False,  # Citibank vs Citadines hotels
+    ('Columbia1938', 'Columbia Bank'): False,  # Columbia sportswear vs bank
+    ('Columbiacrest', 'Columbia Bank'): False,  # Winery vs bank
+    ('Deutschebank', 'Dieterich Bank'): False,  # Deutsche Bank vs small Illinois bank
+
+    # Barneys vs Barnes (FALSE)
+    ('Barneysny', 'Barnes and Noble'): False,  # Barneys NY luxury vs B&N bookstore
+
+    # Brooklyn Nets (sports team) vs unrelated (FALSE)
+    ('Brooklynnets', 'Brookline Bank'): False,
+    ('Brooklynnets', 'Brooklyn Harvest Markets'): False,
+    ('Brooklynnets', 'Brookstone'): False,
+
+    # Building materials vs auto (FALSE)
+    ('Certainteed', 'CertiFit'): False,  # Building materials vs auto parts
+
+    # Chaco sandals confusions (FALSE)
+    ('Chacousa', 'Chao Cajun'): False,
+    ("Chacousa", "Chico's"): False,
+    ("Chacousa", "Chu's"): False,
+
+    # Charles Schwab vs Charles & Keith (FALSE)
+    ('Charlesschwab', 'Charles & Keith'): False,  # Brokerage vs fashion
+
+    # Cheesecake Factory vs specialty shop (FALSE)
+    ('Cheesecake', 'Cheesetique'): False,
+
+    # Cinemax vs theater (FALSE)
+    ('Cinemax', 'CineArts'): False,  # HBO channel vs theater chain
+
+    # CNBC vs CIBC (FALSE)
+    ('Cnbc', 'CIBC'): False,  # News vs Canadian bank
+
+    # Collective vs coffee (FALSE)
+    ('Collectiveevol', 'Colectivo Coffee'): False,  # Website vs coffee shop
+
+    # Courtyard hotels (TRUE - same brand!)
+    ('Courtyardhotels', 'Courtyard by Marriott'): True,
+
+    # Daily (FALSE)
+    ("Dailyfetched", "Daily's"): False,  # Website vs convenience
+
+    # Dallas sports teams (FALSE)
+    ('Dallascowboys', 'Dallas BBQ'): False,
+    ('Dallasmavs', 'Dallas BBQ'): False,
+
+    # Delicious (FALSE)
+    ('Delicious', 'Sodalicious'): False,
+
+    # Dell vs DaBella (FALSE)
+    ('Dell', 'DaBella'): False,  # Computers vs home improvement
+
+    # Dick's Sporting Goods vs Dickey's BBQ (FALSE)
+    ("Dicks", "Dickey's Barbecue Pit"): False,
+
+    # Dollar brands (FALSE)
+    ('Dollarcars', 'Dollar Loan Center'): False,  # Rental vs payday loans
+    ('Dollargeneral', 'Dollar Castle'): False,
+
+    # Drury vs Dream hotels (FALSE)
+    ('Druryhotels', 'Dream Hotels'): False,
+
+    # Philadelphia Eagles vs unrelated (FALSE)
+    ('Eagles', 'Eagle Transmission'): False,
+    ('Eagles', 'EagleRider'): False,
+
+    # Eddie Bauer vs Eddie Merlot's (FALSE)
+    ("Eddiebauer", "Eddie Merlot's"): False,  # Clothing vs steakhouse
+
+    # E! Entertainment vs AMC (FALSE)
+    ('Eentertainment', 'AMC Entertainment'): False,
+
+    # eHarmony vs Harmons (FALSE)
+    ('Eharmony', 'Harmons'): False,  # Dating vs grocery
+
+    # Electrolux vs electronics (FALSE)
+    ('Electroluxus', 'Electronic Express'): False,
+
+    # Ferragamo vs Ferrari (FALSE)
+    ('Ferragamo', 'Ferrari'): False,  # Fashion vs cars
+
+    # Finish Line vs FinishMaster (FALSE)
+    ('Finishline', 'FinishMaster'): False,  # Shoes vs auto paint
+
+    # Foot Locker's Footaction vs Foot Solutions (FALSE)
+    ('Footaction', 'Foot Solutions'): False,
+
+    # Foster's beer vs Fosters Freeze (FALSE)
+    ('Fostersuk', 'Fosters Freeze'): False,  # Beer vs ice cream
+
+    # FreshDirect (FALSE)
+    ('Freshdirect', 'FreshPoint'): False,
+    ('Freshdirect', 'Freshies Deli'): False,
+
+    # Financial Times vs FATZ (FALSE)
+    ('Ft', 'FATZ'): False,
+
+    # Cosi restaurant vs GetGo (FALSE)
+    ('Get_Cosi', 'GetGo'): False,
+
+    # Giant Food Stores (TRUE - same chain pharmacy!)
+    ('Giantfoodstores', 'Giant Food Pharmacy'): True,
+
+    # SF Giants vs Giant Eagle (FALSE)
+    ('Giants', 'Giant Eagle'): False,
+
+    # Golf Channel vs Golfland (FALSE)
+    ('Golfchannel', 'Golfland'): False,
+
+    # Goose Island beer vs Goosehead Insurance (FALSE)
+    ('Gooseisland', 'Goosehead Insurance'): False,
+
+    # Habitat for Humanity (TRUE - same org!)
+    ('Habitat_Org', 'Habitat for Humanity ReStore'): True,
+
+    # Haggar vs Haggen (FALSE)
+    ('Haggarco', 'Haggen Pharmacy'): False,  # Haggar clothing vs Haggen grocery
+
+    # Hanes vs Hanna Andersson (FALSE)
+    ('Hanes', 'Hanna Andersson'): False,
+
+    # Hermès (TRUE - same luxury brand!)
+    ('Hermes_Paris', 'Hermès'): True,
+
+    # Hilton (TRUE - same brand!)
+    ('Hiltonhotels', 'Hilton International'): True,
+
+    # Hoover vs HearUSA (FALSE)
+    ('Hooverusa', 'HearUSA'): False,  # Vacuums vs hearing
+
+    # Auto dealer combinations with Infiniti (TRUE)
+    ('Infinitiusa', 'Infiniti,Volvo'): True,
+
+    # InterContinental Hotels (TRUE - same brand!)
+    ('Interconhotels', 'InterContintinental Hotels & Resorts'): True,
+
+    # Intuit vs Inta Juice (FALSE)
+    ('Intuit', 'Inta Juice'): False,
+
+    # Invesco vs Investors Bank (FALSE)
+    ('Invescous', 'Investors Bank'): False,
+
+    # Jack Daniel's confusions (FALSE)
+    ("Jackdaniels_Us", "Jack's Urban Eats"): False,
+    ("Jackdaniels_Us", "Jackpot Joanie's"): False,
+
+    # Jacksonville Jaguars confusions (FALSE)
+    ('Jaguars', 'Jaggers'): False,
+    ('Jaguars', 'Jaguar,Land Rover'): False,  # NFL team vs car dealers
+
+    # James Hardie vs Jameson (FALSE)
+    ("Jameshardie", "Jameson's Charthouse"): False,
+
+    # Jameson whiskey vs Jameson Inn (FALSE)
+    ('Jamesonwhiskey', 'Jameson Inn'): False,
+
+    # Johnnie Walker vs Johnny's Markets (FALSE)
+    ("Johnniewalkerus", "Johnny's Markets"): False,
+
+    # Land Rover dealers (TRUE)
+    ('Landroverusa', 'Land Rover,Jaguar,Cadillac'): True,
+    ('Landroverusa', 'Land Rover,Jaguar,Lincoln'): True,
+
+    # Leading Hotels vs others (FALSE)
+    ('Leadinghotels', 'Design Hotels'): False,
+    ('Leadinghotels', 'LINE Hotel'): False,
+
+    # LG vs LUSH (FALSE)
+    ('Lgus', 'LUSH'): False,  # Electronics vs cosmetics
+
+    # Liberty videos (FALSE)
+    ('Libertyvideos', 'Liberty Bank Illinois'): False,
+    ('Libertyvideos', 'Liberty Tax Service'): False,
+
+    # Lincoln dealers (TRUE)
+    ('Lincolnmotorco', 'Lincoln,Ford Motor Company,Jeep'): True,
+    ('Lincolnmotorco', 'Lincoln,Ford Motor Company,Lexus'): True,
+    ('Lincolnmotorco', 'Lincoln,Ford Motor Company,Mazda'): True,
+
+    # Lithium Tech vs Lithia Auto (FALSE)
+    ('Lithiumtech', 'Lithia Auto Stores,Chevrolet'): False,
+
+    # Lone Star Beer vs others (FALSE)
+    ('Lonestarbeer', 'Lone Star Food Stores'): False,
+    ('Lonestarbeer', 'Lone Star Title Loans'): False,
+
+    # Lyft vs LYFE Kitchen (FALSE)
+    ('Lyft', 'LYFE Kitchen'): False,
+
+    # Maserati dealers (TRUE)
+    ('Maserati_Hq', 'Maserati,Alfa Romeo'): True,
+    ('Maserati_Hq', 'Maserati,Ferrari'): True,
+    ('Maserati_Hq', 'Maserati,Porsche,Ferrari'): True,
+
+    # Mazda dealers (TRUE)
+    ('Mazdausa', 'Mazda,Volkswagen'): True,
+
+    # Mercy Corps vs MercyOne (FALSE)
+    ('Mercycorps', 'MercyOne'): False,  # Nonprofit vs hospital
+
+    # Michael Kors vs Michaels Jewelers (FALSE)
+    ('Michaelkors', 'Michaels Jewelers'): False,
+
+    # Miller Lite vs Miller's (FALSE)
+    ("Millerlite", "Miller's Ale House"): False,
+    ("Millerlite", "Miller's Market"): False,
+
+    # Mint vs Mixt (FALSE)
+    ('Mint', 'Mixt'): False,  # Finance app vs restaurant
+
+    # MoneyGram vs MoneyPass (FALSE)
+    ('Moneygram', 'MoneyPass ATM'): False,
+
+    # Morgans Hotels vs Morgan Jewelers (FALSE)
+    ('Morganshotels', 'Morgan Jewelers'): False,
+
+    # MySpace vs MindSpace (FALSE)
+    ('Myspace', 'MindSpace'): False,  # Social media vs coworking
+
+    # Nescafé/Nestlé confusions (FALSE - these are brands, not retail)
+    ('Nescafe', 'Nestlé Café'): False,
+    ('Nestleusa', 'Nestlé Café'): False,
+
+    # New Yorker magazine vs NY companies (FALSE)
+    ('Newyorker', 'New York & Company'): False,
+    ('Newyorker', 'New York Sports Club'): False,
+
+    # Nissan dealers (TRUE)
+    ('Nissanusa', 'Nissan,AutoNation'): True,
+    ('Nissanusa', 'Nissan,Cadillac'): True,
+    ('Nissanusa', 'Nissan,Jeep'): True,
+
+    # Norton vs Nordstrom (FALSE)
+    ('Norton', 'Nordstrom'): False,  # Security software vs retail
+
+    # Paramount vs Paragon (FALSE)
+    ('Paramountnet', 'Paragon Theaters'): False,
+
+    # Patagonia vs Pagani (FALSE)
+    ('Patagonia', 'Pagani'): False,  # Clothing vs supercars
+
+    # Payless shoes vs Pay Less Super Markets (FALSE)
+    ('Paylessisback', 'Pay Less Super Markets'): False,
+
+    # PETA vs Pet Planet (FALSE)
+    ('Peta', 'Pet Planet'): False,  # Animal rights vs pet store
+
+    # Pioneer electronics vs Pioneer Bank (FALSE)
+    ('Pioneerusa', 'Pioneer Bank Texas'): False,
+
+    # Pizza Hut vs other pizza (FALSE - competitors)
+    ('Pizzahut', 'Pizza Factory'): False,
+    ('Pizzahut', 'Pizza Fusion'): False,
+    ('Pizzahut', 'Pizza Inn'): False,
+    ('Pizzahut', 'Pizza Studio'): False,
+
+    # PolitiFact vs Polito's Pizza (FALSE)
+    ("Politifact", "Polito's Pizza"): False,
+
+    # QuickBooks vs Quick Shop (FALSE)
+    ('Quickbooks', 'Quick Shop'): False,
+
+    # Quicken Loans vs QuikE (FALSE)
+    ('Quickenloans', 'QuikE'): False,
+
+    # Ralph Lauren vs Ralphs grocery (FALSE)
+    ('Ralphlauren', 'Ralphs'): False,
+
+    # Red Cross vs Green Cross (FALSE)
+    ('Redcross', 'Green Cross'): False,
+
+    # Red Hat vs Redi Mart (FALSE)
+    ('Redhat', 'Redi Mart'): False,
+
+    # Ren Hotels confusions (FALSE)
+    ('Renhotels', 'Design Hotels'): False,
+    ('Renhotels', 'Dream Hotels'): False,
+
+    # Rent-A-Center vs Rent A Wheel (FALSE)
+    ('Rentacenter', 'Rent A Wheel'): False,
+
+    # Rolls-Royce dealers (TRUE)
+    ('Rollsroyce', 'Rolls‑Royce Motor Cars,Bentley Motors,Porsche'): True,
+    ('Rollsroyce', 'Rolls‑Royce Motor Cars,Lotus Dealers'): True,
+
+    # Ruby Tuesday vs Ruby Tequila's (FALSE)
+    ("Rubytuesday", "Ruby Tequila's"): False,
+
+    # Samsung (FALSE - semiconductor facility, not consumer retail)
+    ('Samsungus', 'Samsung Semiconductor R&D'): False,
+
+    # Sharp vs Sharp Shopper (FALSE)
+    ('Sharphomeusa', 'Sharp Shopper'): False,
+
+    # Snapchat vs Snap Kitchen (FALSE)
+    ('Snapchat', 'Snap Kitchen'): False,
+
+    # SpaceX vs Space Age Fuel (FALSE)
+    ('Spacex', 'Space Age Fuel'): False,
+
+    # Speedway vs similar-named (FALSE)
+    ('Speedway', 'Speedee Mart'): False,
+    ('Speedway', 'Speedy Stop'): False,
+
+    # Stella Artois vs Stellar Bank (FALSE)
+    ('Stellaartois', 'Stellar Bank'): False,
+
+    # Stop & Shop vs Stop 'n Save (FALSE)
+    ("Stopandshop", "Stop 'n Save"): False,
+
+    # Stripe vs Stride Rite (FALSE)
+    ('Stripe', 'Stride Rite'): False,
+
+    # Subaru dealers (TRUE)
+    ('Subaru_Usa', 'Subaru,AutoNation'): True,
+    ('Subaru_Usa', 'Subaru,Hyundai Motor'): True,
+    ('Subaru_Usa', 'Subaru,Porsche'): True,
+
+    # Sundance TV vs Sun Tan City (FALSE)
+    ('Sundancetv', 'Sun Tan City'): False,
+
+    # Taco Bell vs TacoTime (FALSE - competitors)
+    ('Tacobell', 'TacoTime'): False,
+
+    # Targus vs Target (FALSE)
+    ('Targus', 'Target'): False,  # Laptop bags vs retailer
+
+    # TaskRabbit vs JackRabbit (FALSE)
+    ('Taskrabbit', 'JackRabbit'): False,
+
+    # The Blaze vs The Blazing Onion (FALSE)
+    ('Theblaze', 'The Blazing Onion'): False,
+
+    # Thomson Reuters vs Thompson Hotels (FALSE)
+    ('Thomsonreuters', 'Thompson Hotels'): False,
+
+    # Thrifty Car Rental (TRUE!)
+    ('Thriftycars', 'Thrifty Car Rental International'): True,
+
+    # Trump properties (TRUE - same org)
+    ('Trumpdoral', 'TRUMP Hotels'): True,
+    ('Trumpgolfdc', 'TRUMP Hotels'): True,
+    ('Trumpgolfla', 'TRUMP Hotels'): True,
+    ('Trumpgotraided', 'TRUMP Hotels'): False,  # Hashtag, not a brand
+
+    # Twitchy vs Twitch Fitness (FALSE)
+    ('Twitchyteam', 'Twitch Fitness'): False,
+    ('Twitter', 'Twitch Fitness'): False,
+
+    # Univision vs UniVista Insurance (FALSE)
+    ('Univision', 'UniVista Insurance'): False,
+
+    # US News vs Hudson News (FALSE)
+    ('Usnews', 'Hudson News'): False,
+
+    # Vans vs Vons (FALSE)
+    ('Vans', 'Vons'): False,  # Shoes vs grocery
+    ("Vansgirls", "Van's Golf Shops"): False,
+
+    # Versatex vs Versona (FALSE)
+    ('Versatex', 'Versona'): False,
+
+    # Virgin Atlantic vs Virgin Hotel (FALSE - different Virgin companies)
+    ('Virginatlantic', 'Virgin Hotel'): False,
+
+    # Volvo dealers (TRUE)
+    ('Volvocars', 'Volvo,Mazda'): True,
+
+    # Washington Post vs Washington Federal (FALSE)
+    ('Washingtonpost', 'Washington Federal'): False,
+
+    # Wild Turkey vs Wild Fork (FALSE)
+    ('Wildturkey', 'Wild Fork'): False,  # Whiskey vs meat
+
+    # Williams-Sonoma vs Wilsons (FALSE)
+    ('Williamssonoma', 'Wilsons'): False,
+
+    # YMCA vs YWCA (FALSE - separate organizations)
+    ('Ymca', 'YWCA'): False,
+
+    # Zerohedge vs Zerorez (FALSE)
+    ('Zerohedge', 'Zerorez'): False,
+
+    # Zomato vs Zoom Tan (FALSE)
+    ('Zomatous', 'Zoom Tan'): False,
+
+    # ===== BATCH 3: Remaining clear TRUE matches (brand + descriptor) =====
+
+    # Core brand matches with descriptors (TRUE)
+    ('Burtonsnowboard', 'Burton Snowboards'): True,
+    ('Hancockwhitney', 'Hancock Whitney Bank'): True,
+    ('Santanderbankus', 'Santander Bank'): True,
+    ('Hollisterco', 'Hollister'): True,
+    ('Amwayus', 'Amway'): True,
+    ('Kohler', 'Kohler Co'): True,
+    ('Haggarco', 'Haggar'): True,
+    ('Phillips66gas', 'Phillips 66'): True,
+    ('Radisson', 'Radisson Blu'): True,
+    ('Riteaid', 'Rite Aid Pharmacy'): True,
+    ('Marriott', 'Marriott Hotels'): True,
+    ('Doubletree', 'DoubleTree by Hilton'): True,
+    ('Rosewoodhotels', 'Rosewood Hotels and Resorts'): True,
+    ('Potterybarn', 'Pottery Barn Kids'): True,
+    ('Cornerbakery', 'Corner Bakery Cafe'): True,
+    ('Skechersusa', 'Skechers'): True,
+    ('Radisson', 'Radisson Red'): True,
+    ('Lululemon', 'lululemon athletica'): True,
+    ('Potterybarn', 'Pottery Barn Teen'): True,
+    ('Mckinsey', 'McKinsey & Company'): True,
+    ('Qdoba', 'Qdoba Mexican Grill'): True,
+    ('Giantfoodstores', 'Giant Food'): True,
+    ('Fifththird', 'Fifth Third Bank'): True,
+    ('Embassysuites', 'Embassy Suites Hotels'): True,
+    ('Hyundai', 'Hyundai Motor'): True,
+    ('Anheuserbusch', 'Anheuser-Busch Brewery'): True,
+    ('Verizon', 'Verizon Wireless'): True,
+    ('Sheratonhotels', 'Sheraton Hotels & Resorts'): True,
+    ('Molsoncoors', 'Molson Coors Brewery'): True,
+    ('Birkenstockusa', 'Birkenstock'): True,
+    ('Hsbc', 'HSBC Bank'): True,
+    ('Adidasus', 'Adidas'): True,
+    ('Wholefoods', 'Whole Foods Market'): True,
+    ('Chrysler', 'Chrysler,Jeep'): True,
+    ('Dominos', "Domino's Pizza"): True,
+    ('Thebodyshopus', 'The Body Shop'): True,
+    ('Keybankctr', 'KeyBank'): True,
+    ('Publix', 'Publix Super Markets'): True,
+    ('Footlocker', 'Kids Foot Locker'): True,
+    ('Popeyes', 'Popeyes Louisiana Kitchen'): True,
+    ('Sysco', 'Sysco Distribution'): True,
+    ('Footlockerwomen', 'Foot Locker'): True,
+    ('Hanes', 'Hanesbrands'): True,
+    ('Nespressousa', 'Nespresso'): True,
+    ('Caterpillarinc', 'Caterpillar'): True,
+    ('Residenceinn', 'Residence Inn by Marriott'): True,
+    ('Marriott', 'JW Marriott'): True,
+    ('Merrelloutside', 'Merrell'): True,
+    ('Publix', 'Publix Pharmacy'): True,
+    ('Mazdausa', 'Mazda'): True,
+    ('Pier1', 'Pier 1 Imports'): True,
+    ('Conoco', 'ConocoPhillips'): True,
+    ('Merck', 'Merck KGAA'): True,
+    ('Nissanusa', 'Nissan'): True,
+    ('Citizensbank', 'Citizens Bank & Trust'): True,
+    ('Century21', 'Century 21 Real Estate'): True,
+    ('Dennysdiner', "Denny's"): True,
+    ('Peiwei', 'Pei Wei Asian Diner'): True,
+    ('Maserati_Hq', 'Maserati'): True,
+    ('Wellsfargo', 'Wells Fargo ATM'): True,
+    ('Sofitelnews', 'Sofitel'): True,
+    ('Radisson', 'Radisson Americas'): True,
+    ('Safeway', 'Safeway Pharmacy'): True,
+    ('Sears', 'Sears Auto'): True,
+    ('Modells', "Modell's Sporting Goods"): True,
+    ('Aaronsco', "Aaron's"): True,
+    ('Homedepot', 'The Home Depot'): True,
+    ('Kroger', 'Kroger Pharmacy'): True,
+    ('Regionsbank', 'Regions Bank ATM'): True,
+    ('Cargill', 'Cargill Manufacturing'): True,
+    ('Tdbank_Us', 'TD Bank'): True,
+    ('Mercedesbenz', 'Mercedes Benz,Audi'): True,
+    ('Hyatt', 'Hyatt Place'): True,
+    ('Chevrolet', 'Chevrolet,Buick'): True,
+    ('Landroverusa', 'Land Rover'): True,
+    ('Acura', 'Acura,Honda'): True,
+    ("Dunkindonuts", "Dunkin'"): True,
+    ('Radisson', 'Radisson Individuals'): True,
+    ('Rotary', 'Rotary Club'): True,
+    ('Loccitaneusa', "L'Occitane"): True,
+    ('Staplesstores', 'Staples'): True,
+    ('Crowneplaza', 'Crowne Plaza Hotels and Resorts'): True,
+    ('Holidayinn', 'Holiday Inn Resort'): True,
+    ('Kimpton', 'Kimpton Hotels & Restaurants'): True,
+    ('Costco', 'Costco Pharmacy'): True,
+    ('Holidayinn', 'Holiday Inn Express'): True,
+    ('Gymboree', 'Gymboree Play and Music'): True,
+    ('Acura', 'Acura,Toyota'): True,
+    ('Kmart', 'Kmart Pharmacy'): True,
+    ('Armani', 'Armani/Casa'): True,
+    ('Ritzcarlton', 'The Ritz-Carlton'): True,
+    ('Menswearhouse', "The Men's Wearhouse"): True,
+    ('Unilever', 'Unilever Factory'): True,
+    ('Bcbgmaxazria', 'BCBG'): True,
+    ('Wyndhamhotels', 'Wyndham'): True,
+    ('Chilis', "Chili's Grill & Bar"): True,
+    ('Fedex', 'FedEx Freight'): True,
+    ('Buick', 'Buick,Chevrolet'): True,
+    ('Nordstrom', 'Nordstrom Local'): True,
+    ('Chevrolet', 'Chevrolet,Toyota'): True,
+    ('Citizensbank', 'Citizens Bank Indiana'): True,
+    ('Subaru_Usa', 'Subaru'): True,
+    ('Childrensplace', "The Children's Place"): True,
+    ('Meijer', 'Meijer Pharmacy'): True,
+    ('Cadillac', 'Cadillac,Buick'): True,
+    ('Kpmg_Us', 'KPMG'): True,
+    ('Mercedesbenz', 'Mercedes Benz,Toyota'): True,
+    ('Hyatt', 'Hyatt House'): True,
+    ('Chrysler', 'Chrysler,Ram,Jeep'): True,
+    ('Cadillac', 'Cadillac,Lincoln'): True,
+    ('Pandora_Na', 'Pandora'): True,
+    ('Chrysler', 'Chrysler,Dodge,Ram'): True,
+    ('Hyatt', 'Hyatt Hotels & Resorts'): True,
+    ('Radisson', 'Radisson Blu Americas'): True,
+    ('Hyatt', 'Hyatt Regency'): True,
+    ('Championusa', 'Champion'): True,
+    ('Acura', 'Acura,MINI'): True,
+    ('Astonmartin', 'Aston Martin,Jaguar'): True,
+    ('Mercedesbenz', 'BMW,Mercedes Benz'): True,
+    ('Mercedesbenz', 'Mercedes Benz,Mazda'): True,
+    ('Westin', 'Westin Hotels & Resorts'): True,
+    ('Lowes', 'Lowes Foods'): True,
+    ('Acura', 'Acura,Mercedes Benz'): True,
+    ('Capitalone', 'Capital One ATM'): True,
+    ('Bentleymotors', 'Bentley Motors,Maserati'): True,
+    ('Chevrolet', 'Chevrolet,Subaru'): True,
+    ('Porsche', 'Porsche Design'): True,
+    ('Cadillac', 'Cadillac,Volvo'): True,
+    ('Citi', 'Citibank'): True,
+    ('Walmart', 'Walmart Pharmacy'): True,
+    ('Chevrolet', 'Chevrolet,Cadillac'): True,
+    ('Astonmartin', 'Aston Martin,Alfa Romeo'): True,
+    ('Acura', 'Acura,Mazda'): True,
+    ('Landrover', 'Land Rover,Jaguar'): True,
+    ('Mercedesbenz', 'Mercedes Benz,Porsche'): True,
+    ('Fedex', 'FedEx Logistics'): True,
+    ('Bentleymotors', 'Bentley Motors,Aston Martin'): True,
+    ('Chevrolet', 'Chevrolet,Honda'): True,
+    ('Chevrolet', 'Chevrolet,Volvo'): True,
+    ('Saks', 'Saks Fifth Avenue'): True,
+    ('7eleven', '7-Eleven Fuel'): True,
+    ('Acura', 'Acura,Volvo'): True,
+    ('Chevrolet', 'Chevrolet,Isuzu'): True,
+    ('Bjswholesale', "BJ's Wholesale Club"): True,
+    ('Lowes', "Lowe's Market"): True,
+    ('Hallmark', 'Hallmark Cards'): True,
+    ('Traderjoeslist', "Trader Joe's"): True,
+    ('Hsbc', 'HSBC ATM'): True,
+    ('Asicsamerica', 'ASICS'): True,
+    ('Vansgirls', 'Vans'): True,
+    ('Lushcosmetics', 'LUSH'): True,
+    ('Radisson', 'Radisson Red Americas'): True,
+    ('Springhillsuite', 'SpringHill Suites by Marriott'): True,
+    ('Capitalone', 'Capital One Cafe'): True,
+    ('Bentleymotors', 'Bentley Motors,Lamborghini'): True,
+    ('Lexus', 'Lexus,Lincoln'): True,
+    ('Costco', 'Costco Optical'): True,
+    ('Anheuserbusch', 'Anheuser-Busch Warehouse'): True,
+    ('Mercedesbenz', 'Mercedes Benz,Nissan'): True,
+    ('Containerstore', 'The Container Store'): True,
+    ('Bobbibrown', 'Bobbi Brown Professional Cosmetics'): True,
+    ('Hyatt', 'Hyatt Centric'): True,
+    ('Mercedesbenz', 'Mercedes Benz,Maserati'): True,
+    ('Vanssurf', 'Vans'): True,
+    ('Cadillac', 'Cadillac,Subaru'): True,
+    ('Publix', 'Publix Liquor Stores'): True,
+    ('Kroger', 'Kroger Distribution'): True,
+    ('Jaguar', 'Jaguar,Subaru'): True,
+    ('Fedex', 'FedEx Drop Box'): True,
+    ('Landrover', 'BMW,Land Rover'): True,
+    ('Acura', 'Acura,AutoNation'): True,
+    ('Sears', 'Sears Hometown Store'): True,
+    ('Sears', 'Sears Outlet Store'): True,
+    ('Jambajuice', 'Jamba'): True,
+    ('Bankofamerica', 'Bank of America ATM'): True,
+    ('Mercedesbenz', 'Mercedes Benz,Infiniti'): True,
+    ('Jcpenney', 'JCPenney Optical'): True,
+    ('Porsche', 'Audi,Porsche'): True,
+    ('Audi', 'Audi,Volvo'): True,
+    ('Chrysler', 'Chrysler,Dodge,Jeep,Ram'): True,
+    ('Dodge', 'Dodge,Ram'): True,
+    ('Safeway', 'Safeway Fuel Station'): True,
+    ('Chase', 'Chase ATM'): True,
+    ('Acura', 'Acura,Alfa Romeo'): True,
+    ('Cadillac', 'Cadillac,AutoNation'): True,
+    ('Dodge', 'Dodge,Jeep'): True,
+    ('Sears', 'Sears Home Services'): True,
+    ('Porsche', 'BMW,Porsche'): True,
+    ('Mercedesbenz', 'Mercedes Benz,Chevrolet'): True,
+    ('Dodge', 'Ram,Dodge'): True,
+    ('Bentleymotors', 'Bentley Motors,Rolls‑Royce Motor Cars'): True,
+    ('Audi', 'Audi,Porsche'): True,
+    ('Meijer', 'Meijer Gas Station'): True,
+    ('Acura', 'Acura,Honda,Infiniti'): True,
+    ('Waldorfastoria', 'Waldorf Astoria Hotels & Resorts'): True,
+    ('Chevrolet', 'Chevrolet,Volkswagen'): True,
+    ('Publix', 'Publix Distribution'): True,
+    ('Hyatt', 'Hyatt Residence Club'): True,
+    ('Fiatusa', 'FIAT'): True,
+    ('Omnihotels', 'Omni Hotels & Resorts'): True,
+    ('Tesla', 'Tesla Motors'): True,
+    ('Louisvuitton', 'Louis Vuitton International'): True,
+    ('Landrover', 'Land Rover,Jaguar,Lexus'): True,
+    ('Bentleymotors', 'Bentley Motors,Land Rover,Jaguar'): True,
+    ('Boeing', 'Boeing Distribution'): True,
+    ('Bmw', 'BMW,Audi'): True,
+    ('Hyundai', 'Hyundai Motor,Volvo'): True,
+    ('Sherwinwilliams', 'Sherwin-Williams Industrial Wood'): True,
+    ('Audi', 'Audi,Mazda'): True,
+    ('Chrysler', 'Chrysler,Lincoln,Ram,Jeep'): True,
+    ('Macys', "Macy's Backstage"): True,
+    ('Cocacola', 'Coca-Cola UNITED'): True,
+    ('Meijer', 'Meijer Optical'): True,
+    ('Astonmartin', 'Aston Martin,Bentley Motors'): True,
+    ('Audi', 'Audi,Lexus'): True,
+    ('Hyundai', 'Hyundai Motor,Mazda'): True,
+    ('Chevron', 'Chevron Extra Mile'): True,
+    ('Bentleymotors', 'Bentley Motors,Lamborghini,Porsche'): True,
+    ('Kroger', 'Kroger Fuel Center'): True,
+    ('Bentleymotors', 'Bentley Motors,Maserati,Ferrari'): True,
+    ('Radioshack', 'RadioShack Express @ HobbyTown'): True,
+    ('Armani', 'Armani Exchange (A/X)'): True,
+    ('Saks', 'Saks Off Fifth'): True,
+    ('Infinitiusa', 'Infiniti'): True,
+    ('Levis', 'Levi Strauss & Co.'): True,
+    ('Johndeere', 'John Deere Manufacturing'): True,
+    ('Bmw', 'BMW,Mazda'): True,
+    ('Costco', 'Costco Gasoline'): True,
+    ('Samsclub', "Sam's Club Distribution"): True,
+    ('Dollargeneral', 'Dollar General Distribution'): True,
+    ('Usps', 'USPS gopost'): True,
+    ('Toyota', 'Toyota,Lexus'): True,
+    ('Kroger', 'Kroger Wine & Spirits'): True,
+    ('Lego_Group', 'LEGO'): True,
+    ('Amazon', 'Amazon Hub'): True,
+    ('Landrover', 'Land Rover,Jaguar,Porsche'): True,
+    ('Holidayinn', 'Holiday Inn Club Vacations'): True,
+    ('Filausa', 'FILA'): True,
+    ('Landrover', 'Land Rover,Audi,Jaguar,Porsche'): True,
+    ('Jaguar', 'Jaguar,Land Rover'): True,
+    ('Armani', 'Armani Restaurant/Cafe'): True,
+    ('Caterpillarinc', 'Caterpillar Manufacturing & Distribution'): True,
+    ('Mayoclinic', 'Mayo Clinic Health System'): True,
+    ('Samsclub', "Sam's Club Fuel Center"): True,
+    ('Toyota', 'Toyota,Subaru'): True,
+    ('Bmw', 'BMW,MINI'): True,
+    ('Hyundai', 'Hyundai Motor,Genesis Auto'): True,
+    ('Proctergamble', 'Procter & Gamble Plant'): True,
+    ('Rydersysteminc', 'Ryder'): True,
+    ('Toyota', 'Toyota,Honda'): True,
+    ('Dodge', 'Dodge,Nissan'): True,
+    ('Toyota', 'Toyota,Mazda'): True,
+    ('Audi', 'Audi,Hyundai Motor'): True,
+    ('Honda', 'Honda,Subaru'): True,
+    ('Dollartree', 'Dollar Tree Distribution'): True,
+    ('Landrover', 'Land Rover,Jaguar,Lincoln'): True,
+    ('Walmart', 'Walmart Photo Center'): True,
+    ('Toyota', 'Toyota,Nissan'): True,
+    ('Kohler', 'Kohler Signature Store'): True,
+    ('Dodge', 'Dodge,Infiniti'): True,
+    ('Walmart', 'Walmart Distribution'): True,
+    ('Honda', 'Honda,Volvo'): True,
+    ('Landrover', 'Land Rover,Jaguar,Mazda'): True,
+    ('Amazon', 'Amazon Books'): True,
+    ('Kroger', 'Kroger Specialty Pharmacy'): True,
+    ('Astonmartin', 'Aston Martin,Lotus Dealers'): True,
+    ('Avis', 'Avis Rent A Car'): True,
+    ('Kohler', 'Kohler Experience Center'): True,
+    ('Landrover', 'Land Rover,Jaguar,Cadillac'): True,
+    ('Ubs', 'UBS Group'): True,
+    ('Honda', 'Honda,Mazda'): True,
+    ('Tesla', 'Tesla Manufacturing'): True,
+    ('Toyota', 'Toyota,Infiniti'): True,
+    ('Toyota', 'Toyota,AutoNation'): True,
+    ('Jaguar', 'BMW,Jaguar'): True,
+    ('Johndeere', 'John Deere Distribution'): True,
+    ('Disney', 'Disney Store'): True,
+    ('Dodge', 'Dodge,Chrysler,Ram'): True,
+    ('Walmart', 'Walmart Vision Center'): True,
+    ('Honda', 'Honda,Lincoln'): True,
+    ('Toyota', 'Toyota,Hyundai Motor'): True,
+    ('Fairmonthotels', 'Fairmont Hotels & Resorts'): True,
+    ('Dodge', 'Dodge,Subaru,Ram'): True,
+    ('Honda', 'Honda,AutoNation'): True,
+    ('Conagrabrands', 'Conagra Brands Manufacturing'): True,
+    ('Fourseasons', 'Four Seasons Hotels and Resorts'): True,
+    ('Dodge', 'Dodge,Hyundai Motor'): True,
+    ('Duh_Progressive', 'Progressive'): True,
+    ('Jaguars', 'Jaguar,Subaru'): False,  # NFL team vs car dealers
+    ('Honda', 'Honda,Infiniti'): True,
+    ('Walmart', 'Walmart Fuel Station'): True,
+    ('Toyota', 'Toyota,Ford Motor Company'): True,
+    ('Dodge', 'Dodge,Chrysler,Jeep'): True,
+    ('Bjswholesale', "BJ's Wholesale Club Gas"): True,
+    ('Lowes', 'Lowes Foods Fuel'): True,
+    ('Lincolnfingroup', 'Lincoln'): True,
+    ('Salomonsports', 'Salomon'): True,
+    ('Honda', 'Honda,Hyundai Motor'): True,
+    ('Alamo', 'Alamo Rent A Car'): True,
+    ('Sierraclub', 'Sierra'): False,  # Environmental org vs Sierra Trading
+    ('Savealot', 'Save-A-Lot Distribution'): True,
+    ('Hertz', 'Hertz Car Sales'): True,
+    ('Century21', 'Century 21 Department Stores'): False,  # Real estate vs defunct department store
+    ('Aldiusa', 'ALDI'): True,
+    ('Chevron', 'Chevron Phillips Chemical'): True,
+    ('Uniqlousa', 'Uniqlo'): True,
+    ('Walmart', 'Walmart Auto Care Center'): True,
+    ('Katespadeny', 'Kate Spade'): True,
+    ('Norton', 'Norton Healthcare'): False,  # Symantec vs healthcare
+    ('Apple', 'AppleCare'): True,
+    ('Microsoft', 'Microsoft Store'): True,
+    ('Ford', 'Ford Motor Company'): True,
+    ('Academy', 'Academy Bank'): False,  # Academy Sports vs bank
+    ('Volvocars', 'Volvo'): True,
+    ('Apple', 'Apple Retail Store'): True,
+    ('Truevalue', 'True Value Company'): True,
+    ('Talbotsofficial', 'Talbots'): True,
+    ('Dicks', "Dick's Sporting Goods"): True,
+    ('Blackrock', 'Black Rock Coffee'): False,  # Investment vs coffee
+    ('Blackrock', 'Black Rock Bar & Grill'): False,
+    ('Blackrock', 'Black Rock Coffee Bar'): False,
+    ('Academy', 'Academy Sports + Outdoors'): True,
+    ('Amazon', 'Amazon Go'): True,
+    ('Amazon', 'Amazon Distribution'): True,
+    ('Shell', 'Shell Oil'): True,
+    ('Amazon', 'Amazon Fresh'): True,
+    ('Tesla', 'Tesla Supercharger'): True,
+    ('Tesla', 'Tesla Motors,Porsche'): True,
+    ('Tesla', 'Tesla Motors,Volvo'): True,
+    ('Target', 'Target Distribution'): True,
+    ('Amazon', 'Amazon 4-Star'): True,
+    ('Armani', 'Giorgio Armani'): True,
+    ('Enterprise', 'Enterprise Rent-A-Car'): True,
+    ('Chicos', "Chico's Off The Rack"): True,
+    ('Budget', 'Budget Host'): False,  # Budget car rental vs Budget Host motels
+
+    # FALSE matches - different companies (remaining)
+    ('Salon', 'Salon Boutique'): False,  # Generic term
+    ('Salon', 'Salon Plaza'): False,
+    ('Salon', 'Salon Lofts'): False,
+    ('Salon', 'Salon Republic'): False,
+    ('Salon', 'SalonCentric'): False,
+    ('Time', 'Times'): False,  # Time magazine vs Times markets
+    ('Time', 'Timex'): False,
+    ('Lions', "Lion's Den"): False,  # Detroit Lions vs adult store
+    ('Lions', 'Lions Market'): False,
+    ("Lions", "Lion's Choice"): False,
+    ('Bonefishgrill', 'Fish Grill'): False,  # Bonefish Grill vs Fish Grill
+    ('Eagles', 'Eagle Stop'): False,  # Philadelphia Eagles vs convenience
+    ('Saints', "Saints Pub & Patio"): False,  # New Orleans Saints vs pub
+    ('Vans', "Van's Golf Shops"): False,  # Vans shoes vs golf
+    ('Naturallight', 'Natura'): False,  # Natural Light beer vs Natura
+    ('Honest', 'Honest 1 Auto Care'): False,  # The Honest Company vs auto
+    ('Benetton', 'United Colors of Benetton'): True,  # Same brand!
+    ('Sierranevada', 'Sierra'): False,  # Sierra Nevada Brewing vs Sierra Trading
+    ('Care', 'CareOne'): False,  # Generic vs specific
+    ('Care', 'Caretenders'): False,
+    ('Citi', 'Citi Trends'): False,  # Citibank vs Citi Trends clothing
+    ('Browns', "Brown's Chicken"): False,  # Cleveland Browns vs chicken
+    ('Speed', 'Speedway'): False,  # Generic vs brand
+    ('Monster', 'Monster Self Storage'): False,  # Monster energy vs storage
+    ('Freshandeasy', 'Fresh'): False,  # Fresh & Easy vs Fresh Market
+    ("Alfreddunhill", "Alfred"): False,  # Alfred Dunhill vs other
+    ('Compassion', 'Compass'): False,  # Compassion International vs real estate
+    ('Compassion', 'Compassionate Care Consultants'): False,
+    ('Guess', 'G By GUESS'): True,  # Same brand
+    ('Guess', 'GUESS Factory'): True,
+    ('Ea', 'EA7'): False,  # Electronic Arts vs Emporio Armani
+    ('Money', 'EZ Money'): False,  # Generic
+    ('Money', 'Money Mart'): False,
+    ('Money', 'MoneyGram'): False,
+    ('Nautica', 'Nautical Bowls.'): False,  # Different
+    ('Bitcoin', 'Bitcoin of America'): True,
+    ('Bitcoin', 'BitcoinX ATM'): True,
+    ('Nytimes', 'Times'): False,
+    ('Latimes', 'Times'): False,
+    ('Discovery', 'Discovery Point'): False,  # Discovery Channel vs childcare
+    ('Discovery', 'Discovery Cove'): True,  # SeaWorld property
+    ('Speed', 'Speedy Stop'): False,
+    ('Speed', 'Spee-D Foods'): False,
+    ('Speed', 'K1 Speed'): False,
+    ('Speed', 'Speedy Cafe'): False,
+    ('Speed', 'Sir Speedy'): False,
+    ('Rei', 'REISS'): False,  # REI outdoor vs REISS fashion
+    ("Rei", "Reid's"): False,
+    ('Bluenilediamond', 'Blue Nile, Inc'): True,
+    ('Ilfornaionline', 'IL Fornaio'): True,
+    ('Gatesfoundation', 'GATE'): False,  # Gates Foundation vs GATE gas
+    ('Red', 'Redi Mart'): False,  # Generic
+    ('Red', 'Red Olive'): False,
+    ('Red', 'Redstone'): False,
+    ('Stripe', 'Stripes Convenience Stores'): False,  # Payments vs convenience
+    ('Sap', 'Sapp Bros'): False,  # SAP software vs truck stops
+    ('Delicious', 'Deli Delicious'): False,
+    ('Dicks', 'Dicks Wings and Grill'): False,  # Dick's Sporting vs restaurant
+    ("Dicks", "Dick's Drive-in"): False,
+    ("Dicks", "Dick's Fresh Market"): False,
+    ("Dicks", "Dick's Homecare, Inc."): False,
+    ('Browns', "Brown's Shoe Fit Co."): False,
+    ('Box', 'BoxLunch'): False,  # Box.com vs Hot Topic subsidiary
+    ('Thestreet', 'Health Street'): False,  # TheStreet.com vs drug testing
+    ('Vimeo', 'VIM'): False,  # Vimeo vs VIM Fitness
+    ('Kiplinger', 'Kipling'): False,  # Kiplinger finance vs Kipling bags
+    ('Delta', 'Delta Hotels'): False,  # Delta Airlines vs Marriott's Delta Hotels
+    ('Oxygen', 'Oxygen Yoga And Fitness'): False,  # Oxygen network vs yoga
+    ('Ally', 'Rally'): False,  # Ally Bank vs Rally House
+    ('Audiobooks_Com', 'Audi'): False,
+    ('Cbs', 'CB&S Bank'): False,  # CBS network vs bank
+    ('Ramsnfl', 'Ram'): False,  # LA Rams vs Ram trucks
+    ('Apple', 'Applegreen'): False,  # Apple vs Irish convenience chain
+    ('Audible_Com', 'Audi'): False,
+
+    # Final 3 unlabeled
+    ('Apple', 'Apple Market'): False,  # Apple Inc vs Apple Market grocery
+    ('Citi', 'Citizens Bank'): False,  # Citibank vs Citizens Bank
+    ('Trumpgolf', 'Topgolf'): False,  # Trump Golf vs Topgolf entertainment
 }
 
 if __name__ == '__main__':
