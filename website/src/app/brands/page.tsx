@@ -116,12 +116,12 @@ export default function BrandsPage() {
         </p>
 
         {/* Table */}
-        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
+        <div className="bg-white rounded-lg shadow-sm border overflow-hidden overflow-x-auto">
+          <table className="w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-gray-50">
               <tr>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => toggleSort('name')}
                 >
                   <div className="flex items-center gap-1">
@@ -129,11 +129,11 @@ export default function BrandsPage() {
                     {sortField === 'name' && (sortDir === 'asc' ? <SortAsc className="w-3 h-3" /> : <SortDesc className="w-3 h-3" />)}
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Category
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => toggleSort('lean_2020')}
                 >
                   <div className="flex items-center gap-1">
@@ -142,7 +142,7 @@ export default function BrandsPage() {
                   </div>
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => toggleSort('total_visits')}
                 >
                   <div className="flex items-center gap-1">
@@ -155,21 +155,21 @@ export default function BrandsPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredBrands.slice(0, 100).map(brand => (
                 <tr key={brand.slug} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Link href={`/brands/${brand.slug}`} className="text-blue-600 hover:text-blue-800 font-medium">
+                  <td className="px-6 py-4">
+                    <Link href={`/brands/${brand.slug}`} className="text-blue-600 hover:text-blue-800 font-medium block truncate">
                       {brand.name}
                     </Link>
                     {brand.company && brand.company !== brand.name && (
-                      <p className="text-xs text-gray-400">{brand.company}</p>
+                      <p className="text-xs text-gray-400 truncate">{brand.company}</p>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-gray-500 truncate">
                     {brand.category || '-'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4">
                     <LeanIndicator lean={brand.lean_2020} size="sm" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-gray-500">
                     {brand.total_visits.toLocaleString()}
                   </td>
                 </tr>
