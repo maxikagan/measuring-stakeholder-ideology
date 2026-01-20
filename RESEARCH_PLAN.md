@@ -27,12 +27,13 @@ Core data infrastructure for partisan lean measurement.
 **Scripts**: `scripts/01_data_prep/`, `scripts/02_partisan_lean/`, `scripts/03_entity_resolution/`
 **Detailed plan**: `docs/plans/data_pipeline_plan.md`
 
-#### Phase 1: POI-Level Partisan Lean (COMPLETE)
+#### Phase 1: POI-Level Partisan Lean (NEEDS CLEANUP)
 | Task | Status | Notes |
 |------|--------|-------|
 | 1.1 Partisan lean computation | ✅ Done | 79 months, 596M POI-month rows. Weighted avg of CBG election results by visitor origin. |
 | 1.2 Extract normalized visits | ✅ Done | 2,096 raw Advan files → extracted `normalized_visits_by_state_scaling` column |
 | 1.3 Join normalized visits | ✅ Done | Merged normalized visits into partisan lean data (79 monthly parquet files) |
+| 1.3b Filter to US states only | ⬚ Pending | **BUG**: Data includes Canadian provinces (AB, BC, MB, etc.) and US territories (AS, GU, MP, PR, VI). Filter to 50 US states + DC only. Requires re-running aggregation. |
 
 #### Phase 2: National Brands (COMPLETE)
 | Task | Status | Notes |
