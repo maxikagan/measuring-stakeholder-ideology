@@ -7,16 +7,25 @@ Run AFTER extract_normalized_visits.py array job completes.
 Usage:
     python3 join_normalized_visits.py
 """
+import sys
+print("Python script starting...", flush=True)
 
 import logging
+print("Importing pandas...", flush=True)
 import pandas as pd
+print("Importing pathlib...", flush=True)
 from pathlib import Path
+print("Importing concurrent.futures...", flush=True)
 from concurrent.futures import ProcessPoolExecutor
+print("Importing pyarrow...", flush=True)
 import pyarrow.parquet as pq
+print("All imports complete", flush=True)
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    stream=sys.stdout,
+    force=True
 )
 logger = logging.getLogger(__name__)
 
@@ -28,10 +37,10 @@ OUTPUT_DIR = PROJECT_DIR / "outputs" / "national_with_normalized"
 
 def load_all_normalized_visits():
     """Load and combine all normalized visits parquet files."""
-    logger.info("Loading normalized visits files...")
+    print("Loading normalized visits files...", flush=True)
 
     files = list(NORMALIZED_DIR.glob("*.parquet"))
-    logger.info(f"Found {len(files)} normalized visits files")
+    print(f"Found {len(files)} normalized visits files", flush=True)
 
     if len(files) == 0:
         raise FileNotFoundError(f"No parquet files found in {NORMALIZED_DIR}")
@@ -74,7 +83,7 @@ def process_month(month_file: Path, normalized_df: pd.DataFrame):
 
 
 def main():
-    logger.info("=== Joining Normalized Visits to Partisan Lean Data ===")
+    print("=== Joining Normalized Visits to Partisan Lean Data ===", flush=True)
 
     normalized_df = load_all_normalized_visits()
 

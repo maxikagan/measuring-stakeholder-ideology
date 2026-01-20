@@ -22,7 +22,7 @@ scripts/
 
 ## Epics & Tasks
 
-### Epic 1: Data Pipeline ✅ COMPLETE
+### Epic 1: Data Pipeline ✅ NEARLY COMPLETE
 Core data infrastructure for partisan lean measurement.
 **Scripts**: `scripts/01_data_prep/`, `scripts/02_partisan_lean/`, `scripts/03_entity_resolution/`
 
@@ -31,21 +31,23 @@ Core data infrastructure for partisan lean measurement.
 | 1.1 Partisan lean computation | ✅ Done | 79 months, 596M rows |
 | 1.2 Entity resolution (brands) | ✅ Done | 3,872 brands, 1.48M POIs |
 | 1.3 Extract normalized visits | ✅ Done | 2,096 files extracted |
-| 1.4 Join normalized visits | 🔄 Running | Job 31680680 |
+| 1.4 Join normalized visits | ✅ Done | 79 files completed |
+| 1.5 Aggregate brand-level lean | ⬚ Pending | Weight by normalized_visits |
 
-### Epic 2: Validation (Option B)
+### Epic 2: Validation (Schoenmueller Comparison) 🔄 IN PROGRESS
 Validate our measure against external benchmarks.
 **Scripts**: `scripts/04_validation/`
 
 | Task | Status | Notes |
 |------|--------|-------|
 | 2.1 Load Schoenmueller data | ⬚ Pending | 1,289 brands available |
-| 2.2 Aggregate brand-level lean | ⬚ Pending | Use normalized_visits weights |
-| 2.3 Match brands to Schoenmueller | ⬚ Pending | Fuzzy match brand names |
-| 2.4 Correlation analysis | ⬚ Pending | Scatter plot, R² |
-| 2.5 Divergence analysis | ⬚ Pending | Where/why do measures differ? |
+| 2.2 Match brands to Schoenmueller | 🔄 In Progress | Semantic similarity approach |
+| 2.3 Correlation analysis | ⬚ Pending | Scatter plot, R² |
+| 2.4 Divergence analysis | ⬚ Pending | Where/why do measures differ? |
 
-### Epic 3: Descriptive Analysis (Option A)
+*Blocked by: 1.5 (brand-level aggregation)*
+
+### Epic 3: Descriptive Analysis ⬚ READY TO START
 Document patterns in consumer partisan lean.
 **Scripts**: `scripts/05_descriptive/`
 
@@ -57,7 +59,7 @@ Document patterns in consumer partisan lean.
 | 3.4 Category comparisons | ⬚ Pending | By NAICS, top_category |
 | 3.5 Top/bottom brand rankings | ⬚ Pending | Most R vs. most D brands |
 
-### Epic 4: Store Performance (Option D)
+### Epic 4: Store Performance (SafeGraph Spend) ⬚ READY TO START
 Link partisan lean to business outcomes using SafeGraph Spend.
 **Scripts**: `scripts/06_performance/`
 
@@ -68,7 +70,7 @@ Link partisan lean to business outcomes using SafeGraph Spend.
 | 4.3 Within-store TWFE | ⬚ Pending | Spending ~ lean × salience |
 | 4.4 Event studies | ⬚ Pending | Elections, Dobbs, etc. |
 
-### Epic 5: Excess Partisan Lean
+### Epic 5: Excess Partisan Lean (Gravity Model) ⬚ BLOCKED
 Control for geography using gravity model.
 **Scripts**: `scripts/07_causal/` (gravity model)
 
@@ -79,18 +81,22 @@ Control for geography using gravity model.
 | 5.3 Compute expected lean | ⬚ Pending | From gravity predictions |
 | 5.4 Calculate excess lean | ⬚ Pending | Actual - expected |
 
-### Epic 6: Employee-Consumer Alignment (Option A extended)
+*Blocked by: Epic 2 validation*
+
+### Epic 6: Employee-Consumer Alignment (Singleton Matching) 🔄 PREREQUISITES DONE
 Link to Politics at Work employee data.
 **Scripts**: `scripts/03_entity_resolution/` (singletons), `scripts/07_causal/`
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 6.1 Entity resolution (singletons) | ⬚ Pending | Match unbranded POIs |
-| 6.2 Link brands to PAW employers | ⬚ Pending | Via entity resolution |
+| 6.0a PAW Company × MSA table | ✅ Done | 4.1M companies, 366 MSAs |
+| 6.0b POI → MSA mapping | ✅ Done | 6.31M POIs with crosswalk |
+| 6.1 Singleton embedding script | ⬚ Pending | Use text-embedding-3-small |
+| 6.2 Link brands to PAW employers | ✅ Done | Via brand entity resolution |
 | 6.3 Compute employee partisanship | ⬚ Pending | From PAW VR scores |
 | 6.4 Alignment correlation | ⬚ Pending | Employee vs. consumer |
 
-### Epic 7: Causal Identification (Later Phase)
+### Epic 7: Causal Identification (Later Phase) ⬚ NOT STARTED
 Establish causal relationships.
 **Scripts**: `scripts/07_causal/`
 
@@ -98,19 +104,20 @@ Establish causal relationships.
 |------|--------|-------|
 | 7.1 Political salience shocks | ⬚ Pending | DiD around elections |
 | 7.2 PCI interaction effects | ⬚ Pending | Partisan Conflict Index |
-| 7.3 Geographic expansion | ⬚ Pending | Option K - entry patterns |
-| 7.4 Worker mobility | ⬚ Pending | Option H - job transitions |
+| 7.3 Geographic expansion | ⬚ Pending | Entry patterns |
+| 7.4 Worker mobility | ⬚ Pending | Job transitions |
 
 ---
 
 ## Current Sprint
 
-**Focus**: Epics 2-4 (Validation, Descriptive, Store Performance)
+**Focus**: Epic 1.5 → Epic 2 → Epics 3-4
 
-**Immediate next steps** (after join job completes):
-1. Task 2.1-2.4: Schoenmueller validation
-2. Task 4.1: SafeGraph Spend exploration
-3. Task 3.1-3.2: Brand distributions and variance decomposition
+**Immediate next steps**:
+1. Task 1.5: Aggregate brand-level lean (unblocks Epic 2)
+2. Task 2.2: Complete brand matching (semantic similarity)
+3. Task 2.3-2.4: Correlation analysis and divergence
+4. Tasks 3.1-3.2: Brand distributions and variance decomposition
 
 ---
 
@@ -119,11 +126,13 @@ Establish causal relationships.
 | Component | Status | Location |
 |-----------|--------|----------|
 | Partisan Lean | ✅ 79 months | `outputs/national/partisan_lean_*.parquet` |
-| Partisan Lean + Normalized | 🔄 Building | `outputs/national_with_normalized/` |
+| Partisan Lean + Normalized | ✅ 79 months | `outputs/national_with_normalized/` |
 | Entity Resolution | ✅ 3,872 brands | `outputs/entity_resolution/brand_matches_validated.parquet` |
+| POI → MSA Mapping | ✅ 6.31M POIs | `outputs/entity_resolution/unbranded_pois_by_msa/` |
 | SafeGraph Spend | ✅ 83 months | `01_foot_traffic_location/safegraph/.../spend/` |
 | Schoenmueller | ✅ 1,289 brands | `reference/other_measures/schoenmueller_et_al/` |
-| PCI Time Series | ✅ 1981-2025 | `data/partisan_conflict_index.csv` |
+| PCI Time Series | ✅ 1981-2025 | `reference/partisan_conflict_index.csv` |
+| PAW Company × MSA | ✅ 4.1M companies | `project_oakland/outputs/paw_company_msa.parquet` |
 
 ---
 
@@ -147,8 +156,8 @@ excess_lean = actual_lean - expected_lean_from_gravity
 
 - **Option G (Temporal)**: Data starts 2019, misses 2016 polarization
 - **Option L (Reviews)**: Lower priority, high effort
-- **Singleton matching**: After branded analysis complete
 
 ---
 
+*Last updated: 2026-01-20*
 *See `reference/FULL_RESEARCH_AGENDA.md` for complete research option details*

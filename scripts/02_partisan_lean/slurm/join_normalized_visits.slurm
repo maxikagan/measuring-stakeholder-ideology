@@ -6,6 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=24:00:00
+#SBATCH --exclude=n0008.savio3
 #SBATCH --output=/global/home/users/maxkagan/measuring_stakeholder_ideology/logs/join_normalized_%j.out
 #SBATCH --error=/global/home/users/maxkagan/measuring_stakeholder_ideology/logs/join_normalized_%j.err
 
@@ -15,8 +16,8 @@ cd /global/home/users/maxkagan/measuring_stakeholder_ideology
 
 echo "Starting join at $(date)"
 echo "Node: $(hostname)"
-echo "Memory available: $(free -h | grep Mem | awk '{print $2}')"
 
-python3 scripts/join_normalized_visits.py
+export PYTHONUNBUFFERED=1
+stdbuf -oL -eL python3 -u scripts/02_partisan_lean/join_normalized_visits.py
 
 echo "Completed at $(date)"
