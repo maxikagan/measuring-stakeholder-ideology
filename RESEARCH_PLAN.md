@@ -32,7 +32,7 @@ Core data infrastructure for partisan lean measurement.
 | 1.2 Entity resolution (brands) | ✅ Done | 3,872 brands, 1.48M POIs |
 | 1.3 Extract normalized visits | ✅ Done | 2,096 files extracted |
 | 1.4 Join normalized visits | ✅ Done | 79 files completed |
-| 1.5 Aggregate brand-level lean | ⬚ Pending | Weight by normalized_visits |
+| 1.5 Aggregate brand-level lean | 🔄 In Progress | Job 31705749 running |
 
 ### Epic 2: Validation (Schoenmueller Comparison) 🔄 IN PROGRESS
 Validate our measure against external benchmarks.
@@ -40,7 +40,7 @@ Validate our measure against external benchmarks.
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 2.1 Load Schoenmueller data | ⬚ Pending | 1,289 brands available |
+| 2.1 Load Schoenmueller data | ✅ Done | 1,289 brands, Rep 0.04-0.98 |
 | 2.2 Match brands to Schoenmueller | 🔄 In Progress | Semantic similarity approach |
 | 2.3 Correlation analysis | ⬚ Pending | Scatter plot, R² |
 | 2.4 Divergence analysis | ⬚ Pending | Where/why do measures differ? |
@@ -97,7 +97,7 @@ Link to Politics at Work employee data.
 |------|--------|-------|
 | 6.0a PAW Company × MSA table | ✅ Done | 4.1M companies, 366 MSAs |
 | 6.0b POI → MSA mapping | ✅ Done | 6.31M POIs with crosswalk |
-| 6.1 Singleton embedding script | ⬚ Pending | Use text-embedding-3-small |
+| 6.1 Singleton embedding script | 🔄 In Progress | Pilot job 31705616 (Columbus OH) |
 | 6.2 Link brands to PAW employers | ✅ Done | Via brand entity resolution |
 | 6.3 Compute employee partisanship | ⬚ Pending | From PAW VR scores |
 | 6.4 Alignment correlation | ⬚ Pending | Employee vs. consumer |
