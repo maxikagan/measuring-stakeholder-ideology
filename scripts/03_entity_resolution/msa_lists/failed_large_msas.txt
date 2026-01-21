@@ -1,0 +1,11 @@
+new_york-northern_new_jersey-long_island_ny-nj-pa
+los_angeles-long_beach-santa_ana_ca
+chicago-joliet-naperville_il-in-wi
+phoenix-mesa-scottsdale_az
+san_diego-carlsbad-san_marcos_ca
+seattle-tacoma-bellevue_wa
+denver-aurora-broomfield_co
+detroit-warren-livonia_mi
+riverside-san_bernardino-ontario_ca
+orlando-kissimmee-sanford_fl
+portland-vancouver-hillsboro_or-wa

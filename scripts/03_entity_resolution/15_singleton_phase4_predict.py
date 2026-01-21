@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pandas as pd
 import numpy as np
-import jellyfish
+from rapidfuzz.distance import JaroWinkler
 
 PROJECT_DIR = Path("/global/scratch/users/maxkagan/measuring_stakeholder_ideology")
 CANDIDATE_DIR = PROJECT_DIR / "outputs" / "singleton_matching"
@@ -58,13 +58,30 @@ def normalize_name(name: str) -> str:
     return s.strip()
 
 
-def normalized_jaro_winkler(a: str, b: str) -> float:
-    """Jaro-Winkler on normalized names."""
-    a_norm = normalize_name(a)
-    b_norm = normalize_name(b)
-    if not a_norm or not b_norm:
-        return 0.0
-    return jellyfish.jaro_winkler_similarity(a_norm, b_norm)
+def compute_normalized_jw_vectorized(poi_names: pd.Series, company_names: pd.Series) -> np.ndarray:
+    """Compute normalized Jaro-Winkler scores using rapidfuzz (C++ backend)."""
+    n = len(poi_names)
+    print(f"    Normalizing {n:,} name pairs...")
+
+    poi_norm = poi_names.apply(normalize_name).values
+    company_norm = company_names.apply(normalize_name).values
+
+    print(f"    Computing Jaro-Winkler similarities...")
+    jw = JaroWinkler()
+
+    scores = np.zeros(n, dtype=np.float32)
+    chunk_size = 100000
+
+    for i in range(0, n, chunk_size):
+        end = min(i + chunk_size, n)
+        if i % 500000 == 0:
+            print(f"      Processing {i:,}-{end:,} of {n:,}...")
+
+        for j in range(i, end):
+            p, c = poi_norm[j], company_norm[j]
+            scores[j] = jw.normalized_similarity(p, c) if p and c else 0.0
+
+    return scores
 
 
 def load_brand_rcids() -> set:
@@ -124,11 +141,11 @@ def main():
     brand_rcids = load_brand_rcids()
     print(f"  Loaded {len(brand_rcids):,} brand rcids")
 
-    # Compute normalized Jaro-Winkler feature
+    # Compute normalized Jaro-Winkler feature (vectorized for speed)
     print(f"\n[4] Computing normalized Jaro-Winkler scores...")
-    candidates['jaro_winkler_norm'] = candidates.apply(
-        lambda r: normalized_jaro_winkler(r['location_name'], r['company_name']),
-        axis=1
+    candidates['jaro_winkler_norm'] = compute_normalized_jw_vectorized(
+        candidates['location_name'],
+        candidates['company_name']
     )
 
     # Prepare features

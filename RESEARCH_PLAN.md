@@ -155,7 +155,10 @@ Link consumer partisan lean to Politics at Work employee ideology data.
 |------|--------|-------|
 | 6.0a PAW Company × MSA table | ✅ Done | 4.1M companies, 366 MSAs. Source: Politics at Work voter registration + employment records. |
 | 6.0b POI → MSA mapping | ✅ Done | 6.31M POIs mapped to 366 MSAs via CBG crosswalk. |
-| 6.1 Singleton embedding matching | 🔄 In Progress | Phases 1-3 complete for Columbus OH pilot. Phase 4 (prediction) running: applying logit model to 1.9M candidate pairs (Job 31709186). |
+| 6.1a Singleton pilot (Columbus OH) | ✅ Done | Phases 1-4 complete. 1.9M candidate pairs, logit model trained. |
+| 6.1b National singleton matching | 🔄 Running | Jobs 31710527-29 submitted (350 MSAs, ~$13.32). 335 MSAs complete. |
+| 6.1c Bigmem retry (large MSAs) | 🔄 Running | Job 31729938 (savio3_bigmem). NYC, LA, Chicago, etc. 2 of 11 tasks still running. |
+| 6.1d Tiered entity resolution | 🔄 Running | Job 31729937. Ticker-first strategy for brand → PAW matching. |
 | 6.2 Link brands to PAW employers | ✅ Done | Via brand entity resolution (Task 1.4). 3,872 brands matched to rcid. |
 | 6.3 Compute employee partisanship | ⬚ Pending | Aggregate PAW VR scores (voter registration) by company. |
 | 6.4 Alignment correlation | ⬚ Pending | Correlate employee partisan lean with consumer partisan lean at company level. |
@@ -195,10 +198,13 @@ Establish causal relationships.
 
 **In progress**:
 - 🔄 Task 3.7a: Coordinate extraction v2 (Job 31709164) - extracting lat/lon from 2096 Advan files
-- 🔄 Task 6.1: Singleton matching Phase 4 (Job 31709186) - applying logit model to 1.9M Columbus pairs
+- 🔄 Task 6.1b: National singleton matching - 335/350 MSAs complete
+- 🔄 Task 6.1c: Bigmem retry (Job 31729938) - large MSAs (NYC, LA, Chicago, etc.)
+- 🔄 Task 6.1d: Tiered entity resolution (Job 31729937) - ticker-first brand → PAW matching
 
-**Completed this session**:
+**Completed this session (2026-01-21)**:
 - ✅ Task 3.7c: JSON export for website (Job 31709151) - brands, timeseries, categories, featured
+- ✅ Task 6.1a: Columbus OH pilot complete - trained logit model on 1,000 labeled pairs
 
 **Next up**:
 1. Epic 3 Phase 2: Interactive website (Brand Partisan Lean Explorer)
@@ -224,6 +230,8 @@ Establish causal relationships.
 | Entity Resolution | ✅ 3,872 brands → companies | `outputs/entity_resolution/brand_matches_validated.parquet` |
 | Brand × Month Aggregated | ✅ 273K rows, 3,543 brands | `outputs/brand_month_aggregated/brand_month_partisan_lean.parquet` |
 | **Singletons** | | |
+| Singleton Crosswalks | 🔄 335/350 MSAs | `outputs/singleton_matching/crosswalks/` |
+| Embedding Cache (numpy) | ✅ Done | `outputs/singleton_matching/embedding_cache_v2/` |
 | Name × MSA × Month Aggregated | ⬚ Pending | `outputs/singleton_name_msa_aggregated/` (planned) |
 | **External Data** | | |
 | SafeGraph Spend | ✅ 83 months | `01_foot_traffic_location/safegraph/.../spend/` |
@@ -262,5 +270,5 @@ excess_lean = actual_lean - expected_lean_from_gravity
 
 ---
 
-*Last updated: 2026-01-20 13:20*
+*Last updated: 2026-01-21 10:00*
 *See `reference/FULL_RESEARCH_AGENDA.md` for complete research option details*

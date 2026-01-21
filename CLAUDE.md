@@ -39,3 +39,10 @@ See `RESEARCH_PLAN.md` for details, `reference/FULL_RESEARCH_AGENDA.md` for comp
 - Brand aggregation weight: `normalized_visits_by_state_scaling`
 - Category grouping: NAICS 4-digit
 - Election data: Both 2016 and 2020
+
+## Politics at Work (PAW) Data
+- **PAW has employee ideology data for ALL companies** - not just public companies
+- Ticker/gvkey are convenient identifiers for matching, but NOT required for PAW coverage
+- Private companies (Chick-fil-A, Wawa, Trader Joe's, etc.) ARE in PAW
+- Entity resolution should match against ALL 535K PAW companies, not just verified ones
+- Match quality tiers: Tier 1 (ticker) > Tier 2 (parent) > Tier 3 (fuzzy to all PAW)
